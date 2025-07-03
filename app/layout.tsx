@@ -2,8 +2,10 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
+import { getCSPHeader } from "@/lib/security"
 
 const inter = Inter({ subsets: ["latin"] })
+
 export const metadata: Metadata = {
   title: {
     default: "Rolled Up Tees - Custom Screen Printing & Embroidery in Nyack, NY",
@@ -177,6 +179,8 @@ const jsonLd = {
   currenciesAccepted: "USD",
 }
 
+// Generate CSP header at build time
+const cspHeader = getCSPHeader()
 
 export default function RootLayout({
   children,
@@ -185,6 +189,34 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        {/* Security Headers */}
+        <meta httpEquiv="Content-Security-Policy" content={cspHeader} />
+        <meta httpEquiv="X-Content-Type-Options" content="nosniff" />
+        <meta httpEquiv="X-Frame-Options" content="DENY" />
+        <meta httpEquiv="X-XSS-Protection" content="1; mode=block" />
+        <meta httpEquiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
+
+        {/* Additional SEO meta tags */}
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="theme-color" content="#B221F6" />
+        <meta name="color-scheme" content="light" />
+
+        {/* Preconnect to external domains */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+
+        {/* JSON-LD structured data */}
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+
+        {/* Favicon and app icons */}
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+        {/* Canonical URL */}
+        <link rel="canonical" href="https://rolleduptees.com" />
+      </head>
       <body className={inter.className}>{children}</body>
     </html>
   )

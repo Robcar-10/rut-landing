@@ -1,16 +1,16 @@
 "use client"
 
 import type React from "react"
-
 import { useState, useRef } from "react"
-import { Button } from "../ui/button"
-import { Input } from "../ui/input"
-import { Card, CardContent } from "../ui/card"
-import { Textarea } from "../ui/textarea"
-import { Upload, X, FileText, CheckCircle, AlertCircle, ImageIcon } from "lucide-react"
+import { Button } from "@/app/components/ui/button"
+import { Input } from "@/app/components/ui/input"
+import { Card, CardContent } from "@/app/components/ui/card"
+import { Textarea } from "@/app/components/ui/textarea"
+import { Upload, X, FileText, CheckCircle, AlertCircle, ImageIcon, Phone, Mail } from "lucide-react"
 import { contactFormSchema, type ContactFormData } from "@/lib/from-validation"
-import { validateFile, createHoneypot, sanitizeInput, isValidEmail, isValidPhone } from "@/lib/security"
-
+import { trackQuoteRequest, trackFileUpload } from "@/lib/analytics"
+import { useCookieConsent } from "@/hooks/useCookieConsent"
+import { validateFile, sanitizeInput, isValidEmail, isValidPhone } from "@/lib/security"
 
 interface ContactFormProps {
   currentLocation: string
@@ -28,6 +28,19 @@ interface UploadedFile {
   error?: string
 }
 
+// Client-side honeypot creation
+const createClientHoneypot = () => ({
+  name: "website", // Common field name bots might fill
+  style: {
+    position: "absolute" as const,
+    left: "-9999px",
+    top: "-9999px",
+    opacity: 0,
+    pointerEvents: "none" as const,
+    tabIndex: -1,
+  },
+})
+
 export const ContactForm = ({ currentLocation }: ContactFormProps) => {
   const [formData, setFormData] = useState<Partial<ContactFormData>>({
     firstName: "",
@@ -42,12 +55,12 @@ export const ContactForm = ({ currentLocation }: ContactFormProps) => {
 
   const [errors, setErrors] = useState<FormErrors>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle")
+  const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error" | "fallback">("idle")
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([])
   const [isDragOver, setIsDragOver] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { hasConsent } = useCookieConsent()
-  const honeypot = createHoneypot()
+  const honeypot = createClientHoneypot()
 
   const handleInputChange = (field: keyof ContactFormData, value: any) => {
     // Sanitize input
@@ -254,9 +267,16 @@ export const ContactForm = ({ currentLocation }: ContactFormProps) => {
         }),
       })
 
+      const responseData = await quoteResponse.json()
+
       if (!quoteResponse.ok) {
-        const errorData = await quoteResponse.json()
-        throw new Error(errorData.error || "Failed to submit quote request")
+        // Check if this is a fallback error (service unavailable)
+        if (responseData.fallback) {
+          setSubmitStatus("fallback")
+        } else {
+          throw new Error(responseData.error || "Failed to submit quote request")
+        }
+        return
       }
 
       // Track successful quote request (only if consent given)
@@ -302,6 +322,47 @@ export const ContactForm = ({ currentLocation }: ContactFormProps) => {
               className="mt-4 bg-purple-500 hover:bg-purple-600 text-white"
             >
               Submit Another Request
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  if (submitStatus === "fallback") {
+    return (
+      <div className="w-full" id="contact-form">
+        <Card className="bg-white/95 backdrop-blur-sm shadow-2xl border-0">
+          <CardContent className="p-6 sm:p-8 text-center">
+            <AlertCircle className="w-16 h-16 text-orange-500 mx-auto mb-4" />
+            <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Contact Us Directly</h3>
+            <p className="text-gray-600 mb-6">
+              Our online form is temporarily unavailable, but we're here to help! Contact us directly using the options
+              below:
+            </p>
+
+            <div className="space-y-4">
+              <Button asChild className="w-full bg-green-500 hover:bg-green-600 text-white py-3 text-lg">
+                <a href="tel:+18453582037" className="flex items-center justify-center gap-2">
+                  <Phone className="w-5 h-5" />
+                  Call (845) 358-2037
+                </a>
+              </Button>
+
+              <Button
+                asChild
+                variant="outline"
+                className="w-full border-purple-300 text-purple-600 hover:bg-purple-50 py-3 text-lg bg-transparent"
+              >
+                <a href="mailto:info@rolleduptees.com" className="flex items-center justify-center gap-2">
+                  <Mail className="w-5 h-5" />
+                  Email info@rolleduptees.com
+                </a>
+              </Button>
+            </div>
+
+            <Button onClick={() => setSubmitStatus("idle")} variant="ghost" className="mt-4 text-gray-500">
+              Try Form Again
             </Button>
           </CardContent>
         </Card>
@@ -494,7 +555,9 @@ export const ContactForm = ({ currentLocation }: ContactFormProps) => {
             {submitStatus === "error" && (
               <div className="flex items-center gap-2 text-red-600 text-sm">
                 <AlertCircle className="w-4 h-4" />
-                <span>There was an error submitting your request. Please try again.</span>
+                <span>
+                  There was an error submitting your request. Please try again or contact us directly at (845) 358-2037.
+                </span>
               </div>
             )}
 

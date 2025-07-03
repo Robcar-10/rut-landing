@@ -1,5 +1,3 @@
-"use client"
-
 // Security utilities and validation functions
 
 // Rate limiting for client-side
@@ -111,14 +109,16 @@ export const validateFile = (file: File): { isValid: boolean; error?: string } =
   return { isValid: true }
 }
 
-// Generate CSRF token
+// Generate CSRF token (client-side only)
 export const generateCSRFToken = (): string => {
+  if (typeof window === "undefined") return ""
+
   const array = new Uint8Array(32)
   crypto.getRandomValues(array)
   return Array.from(array, (byte) => byte.toString(16).padStart(2, "0")).join("")
 }
 
-// Content Security Policy headers (for server-side)
+// Content Security Policy headers (for server-side) - REMOVED "use client"
 export const getCSPHeader = (): string => {
   return [
     "default-src 'self'",
@@ -154,15 +154,24 @@ export const validateEnvVars = () => {
   }
 }
 
-// Honeypot field for forms (anti-bot)
-export const createHoneypot = () => ({
-  name: "website", // Common field name bots might fill
-  style: {
-    position: "absolute" as const,
-    left: "-9999px",
-    top: "-9999px",
-    opacity: 0,
-    pointerEvents: "none" as const,
-    tabIndex: -1,
-  },
-})
+// Honeypot field for forms (anti-bot) - Client-side only
+export const createHoneypot = () => {
+  if (typeof window === "undefined") {
+    return {
+      name: "website",
+      style: {},
+    }
+  }
+
+  return {
+    name: "website", // Common field name bots might fill
+    style: {
+      position: "absolute" as const,
+      left: "-9999px",
+      top: "-9999px",
+      opacity: 0,
+      pointerEvents: "none" as const,
+      tabIndex: -1,
+    },
+  }
+}
