@@ -3,6 +3,7 @@ import { Resend } from "resend"
 import QuoteRequestEmail from "@/app/components/email-templates/quote-request-email"
 import UserReceiptEmail from "@/app/components/email-templates/user-receipt-email"
 import { contactFormSchema } from "@/lib/from-validation"
+import { rateLimiter, sanitizeInput, isValidEmail, isValidPhone } from "@/lib/security";
 
 // Initialize Resend with API key from environment variables
 const resend = new Resend(process.env.RESEND_API_KEY)
@@ -82,7 +83,7 @@ export async function POST(request: NextRequest) {
       await resend.emails.send({
         from: `${userFullName} <${process.env.SENDER_EMAIL}>`,
         to: process.env.GOOGLE_USER as string,
-        replyTo: email,
+        reply_to: email,
         subject: `New Quote Request from ${firstName} ${lastName} (${location})`,
         react: QuoteRequestEmail({
           firstName,
