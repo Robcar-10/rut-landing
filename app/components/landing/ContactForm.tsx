@@ -9,6 +9,8 @@ import { Card, CardContent } from "../ui/card"
 import { Textarea } from "../ui/textarea"
 import { Upload, X, FileText, CheckCircle, AlertCircle, ImageIcon } from "lucide-react"
 import { contactFormSchema, type ContactFormData } from "@/lib/from-validation"
+import { validateFile, createHoneypot, sanitizeInput, isValidEmail, isValidPhone } from "@/lib/security"
+
 
 interface ContactFormProps {
   currentLocation: string
@@ -44,38 +46,18 @@ export const ContactForm = ({ currentLocation }: ContactFormProps) => {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([])
   const [isDragOver, setIsDragOver] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const { hasConsent } = useCookieConsent()
+  const honeypot = createHoneypot()
 
   const handleInputChange = (field: keyof ContactFormData, value: any) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
+    // Sanitize input
+    const sanitizedValue = typeof value === "string" ? sanitizeInput(value) : value
+
+    setFormData((prev) => ({ ...prev, [field]: sanitizedValue }))
     // Clear error when user starts typing
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: "" }))
     }
-  }
-
-  const validateFile = (file: File): string | null => {
-    const maxSize = 30 * 1024 * 1024 // 10MB
-    const allowedTypes = [
-      "image/jpeg",
-      "image/jpg",
-      "image/png",
-      "image/gif",
-      "image/webp",
-      "application/pdf",
-      "application/illustrator",
-      "application/postscript",
-      "image/svg+xml",
-    ]
-
-    if (file.size > maxSize) {
-      return "File size must be less than 30MB"
-    }
-
-    if (!allowedTypes.some((type) => file.type.includes(type.split("/")[1]) || file.type === type)) {
-      return "File type not supported. Please use JPG, PNG, GIF, PDF, AI, EPS, or SVG files."
-    }
-
-    return null
   }
 
   const uploadFileToCloudinary = async (file: File): Promise<any> => {
@@ -93,23 +75,30 @@ export const ContactForm = ({ currentLocation }: ContactFormProps) => {
     })
 
     if (!response.ok) {
-      throw new Error("Upload failed")
+      const errorData = await response.json()
+      throw new Error(errorData.error || "Upload failed")
     }
 
     const result = await response.json()
-    return result.files[0] // Return first file result
+    return result.files[0]
   }
 
   const handleFileUpload = async (files: FileList | File[]) => {
     const fileArray = Array.from(files)
+
+    // Limit number of files
+    if (uploadedFiles.length + fileArray.length > 10) {
+      alert("Maximum 10 files allowed")
+      return
+    }
+
     const validFiles: UploadedFile[] = []
 
     // Validate files first
     for (const file of fileArray) {
-      const error = validateFile(file)
-      if (error) {
-        // Show error for invalid files
-        setUploadedFiles((prev) => [...prev, { file, error }])
+      const validation = validateFile(file)
+      if (!validation.isValid) {
+        setUploadedFiles((prev) => [...prev, { file, error: validation.error }])
         continue
       }
       validFiles.push({ file, uploading: true })
@@ -118,13 +107,17 @@ export const ContactForm = ({ currentLocation }: ContactFormProps) => {
     // Add valid files to state with uploading status
     setUploadedFiles((prev) => [...prev, ...validFiles])
 
+    // Track file upload event (only if analytics consent given)
+    if (hasConsent("analytics") && validFiles.length > 0) {
+      trackFileUpload(validFiles.length, currentLocation)
+    }
+
     // Upload each valid file to Cloudinary
     for (let i = 0; i < validFiles.length; i++) {
       const fileObj = validFiles[i]
       try {
         const uploadResult = await uploadFileToCloudinary(fileObj.file)
 
-        // Update the file with upload result
         setUploadedFiles((prev) =>
           prev.map((f) =>
             f.file === fileObj.file
@@ -139,14 +132,13 @@ export const ContactForm = ({ currentLocation }: ContactFormProps) => {
         )
       } catch (error) {
         console.error("Upload error:", error)
-        // Update file with error status
         setUploadedFiles((prev) =>
           prev.map((f) =>
             f.file === fileObj.file
               ? {
                   ...f,
                   uploading: false,
-                  error: "Upload failed. Please try again.",
+                  error: error instanceof Error ? error.message : "Upload failed. Please try again.",
                 }
               : f,
           ),
@@ -154,7 +146,6 @@ export const ContactForm = ({ currentLocation }: ContactFormProps) => {
       }
     }
 
-    // Update form data with files
     setFormData((prev) => ({
       ...prev,
       files: [...(prev.files || []), ...fileArray],
@@ -204,12 +195,22 @@ export const ContactForm = ({ currentLocation }: ContactFormProps) => {
   }
 
   const validateForm = (): boolean => {
+    const newErrors: FormErrors = {}
+
+    // Additional client-side validation
+    if (!isValidEmail(formData.email || "")) {
+      newErrors.email = "Please enter a valid email address"
+    }
+
+    if (!isValidPhone(formData.phone || "")) {
+      newErrors.phone = "Please enter a valid phone number"
+    }
+
     try {
       contactFormSchema.parse(formData)
-      setErrors({})
-      return true
+      setErrors(newErrors)
+      return Object.keys(newErrors).length === 0
     } catch (error: any) {
-      const newErrors: FormErrors = {}
       error.errors?.forEach((err: any) => {
         const field = err.path[0]
         newErrors[field] = err.message
@@ -249,12 +250,18 @@ export const ContactForm = ({ currentLocation }: ContactFormProps) => {
         body: JSON.stringify({
           ...formData,
           location: currentLocation,
-          uploadedFiles: fileUrls, // Include file URLs in the request
+          uploadedFiles: fileUrls,
         }),
       })
 
       if (!quoteResponse.ok) {
-        throw new Error("Failed to submit quote request")
+        const errorData = await quoteResponse.json()
+        throw new Error(errorData.error || "Failed to submit quote request")
+      }
+
+      // Track successful quote request (only if consent given)
+      if (hasConsent("analytics") || hasConsent("marketing")) {
+        trackQuoteRequest(currentLocation, formData.company || "Unknown")
       }
 
       setSubmitStatus("success")
@@ -314,6 +321,9 @@ export const ContactForm = ({ currentLocation }: ContactFormProps) => {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+            {/* Honeypot field for bot detection */}
+            <input type="text" name={honeypot.name} style={honeypot.style} tabIndex={-1} autoComplete="off" />
+
             {/* Personal Information */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
@@ -323,6 +333,7 @@ export const ContactForm = ({ currentLocation }: ContactFormProps) => {
                   onChange={(e) => handleInputChange("firstName", e.target.value)}
                   className={`border-gray-200 focus:border-purple-400 focus:ring-purple-400 ${errors.firstName ? "border-red-500" : ""}`}
                   placeholder="John"
+                  maxLength={50}
                 />
                 {errors.firstName && <p className="text-xs text-red-500">{errors.firstName}</p>}
               </div>
@@ -333,6 +344,7 @@ export const ContactForm = ({ currentLocation }: ContactFormProps) => {
                   onChange={(e) => handleInputChange("lastName", e.target.value)}
                   className={`border-gray-200 focus:border-purple-400 focus:ring-purple-400 ${errors.lastName ? "border-red-500" : ""}`}
                   placeholder="Doe"
+                  maxLength={50}
                 />
                 {errors.lastName && <p className="text-xs text-red-500">{errors.lastName}</p>}
               </div>
@@ -347,6 +359,7 @@ export const ContactForm = ({ currentLocation }: ContactFormProps) => {
                   onChange={(e) => handleInputChange("email", e.target.value)}
                   className={`border-gray-200 focus:border-purple-400 focus:ring-purple-400 ${errors.email ? "border-red-500" : ""}`}
                   placeholder="john@company.com"
+                  maxLength={254}
                 />
                 {errors.email && <p className="text-xs text-red-500">{errors.email}</p>}
               </div>
@@ -357,6 +370,7 @@ export const ContactForm = ({ currentLocation }: ContactFormProps) => {
                   onChange={(e) => handleInputChange("phone", e.target.value)}
                   className={`border-gray-200 focus:border-purple-400 focus:ring-purple-400 ${errors.phone ? "border-red-500" : ""}`}
                   placeholder="(555) 123-4567"
+                  maxLength={20}
                 />
                 {errors.phone && <p className="text-xs text-red-500">{errors.phone}</p>}
               </div>
@@ -369,6 +383,7 @@ export const ContactForm = ({ currentLocation }: ContactFormProps) => {
                 onChange={(e) => handleInputChange("company", e.target.value)}
                 className={`border-gray-200 focus:border-purple-400 focus:ring-purple-400 ${errors.company ? "border-red-500" : ""}`}
                 placeholder="Your Company"
+                maxLength={100}
               />
               {errors.company && <p className="text-xs text-red-500">{errors.company}</p>}
             </div>
@@ -381,6 +396,7 @@ export const ContactForm = ({ currentLocation }: ContactFormProps) => {
                 onChange={(e) => handleInputChange("message", e.target.value)}
                 className="border-gray-200 focus:border-purple-400 focus:ring-purple-400 min-h-[100px]"
                 placeholder="Tell us more about your project, design ideas, deadlines, or any special requirements..."
+                maxLength={1000}
               />
             </div>
 
@@ -409,7 +425,7 @@ export const ContactForm = ({ currentLocation }: ContactFormProps) => {
                   <p className="text-sm text-gray-600 mb-1">
                     <span className="font-medium text-purple-600">Click to upload</span> or drag and drop
                   </p>
-                  <p className="text-xs text-gray-500">PNG, JPG, PDF, AI, EPS, SVG (max 10MB each)</p>
+                  <p className="text-xs text-gray-500">PNG, JPG, PDF, AI, EPS, SVG (max 30MB each, 10 files max)</p>
                 </label>
               </div>
 
