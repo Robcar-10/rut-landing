@@ -2,12 +2,39 @@ import { type NextRequest, NextResponse } from "next/server"
 import { v2 as cloudinary } from "cloudinary"
 import { rateLimiter } from "@/lib/security"
 
-// Configure Cloudinary
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-})
+// Validate environment variables
+const validateCloudinaryConfig = () => {
+  const requiredVars = {
+    CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME,
+    CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
+    CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
+  }
+
+  const missing = Object.entries(requiredVars)
+    .filter(([_, value]) => !value)
+    .map(([key]) => key)
+
+  if (missing.length > 0) {
+    throw new Error(`Missing required Cloudinary environment variables: ${missing.join(", ")}`)
+  }
+
+  return requiredVars
+}
+
+// Configure Cloudinary with error handling
+let isCloudinaryConfigured = false
+
+try {
+  const config = validateCloudinaryConfig()
+  cloudinary.config({
+    cloud_name: config.CLOUDINARY_CLOUD_NAME,
+    api_key: config.CLOUDINARY_API_KEY,
+    api_secret: config.CLOUDINARY_API_SECRET,
+  })
+  isCloudinaryConfigured = true
+} catch (error) {
+  console.error("Failed to configure Cloudinary:", error)
+}
 
 // Rate limiting configuration
 const RATE_LIMIT = {
@@ -17,6 +44,18 @@ const RATE_LIMIT = {
 
 export async function POST(request: NextRequest) {
   try {
+    // Check if Cloudinary is properly configured
+    if (!isCloudinaryConfigured) {
+      console.error("Cloudinary not configured - missing environment variables")
+      return NextResponse.json(
+        {
+          error: "File upload service unavailable. Please email your files to info@rolleduptees.com",
+          fallback: true,
+        },
+        { status: 503 },
+      )
+    }
+
     // Get client IP for rate limiting
     const clientIP = request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip") || "unknown"
 
@@ -132,7 +171,13 @@ export async function POST(request: NextRequest) {
     })
   } catch (error) {
     console.error("Upload error:", error)
-    return NextResponse.json({ error: "Failed to upload files" }, { status: 500 })
+    return NextResponse.json(
+      {
+        error: "Failed to upload files. Please email your files to info@rolleduptees.com",
+        fallback: true,
+      },
+      { status: 500 },
+    )
   }
 }
 

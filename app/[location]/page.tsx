@@ -1,4 +1,4 @@
-import LocationLanding from "../components/location-landing"
+import LocationLanding from "../../components/location-landing"
 import type { Metadata } from "next"
 
 interface PageProps {
@@ -50,7 +50,7 @@ export async function generateStaticParams() {
   }))
 }
 
-export async function generateMetadata({ params }: PageProps) {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const location = params.location.replace("-", " ").replace(/\b\w/g, (l) => l.toUpperCase())
 
   return {

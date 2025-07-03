@@ -20,10 +20,7 @@
     ],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"],
-       "@/hooks/*": ["hooks/*"],
-       "@/lib/*": ["lib/*"]
-
+      "@/*": ["./*"]
     },
     "forceConsistentCasingInFileNames": true
   },

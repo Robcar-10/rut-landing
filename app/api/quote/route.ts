@@ -1,12 +1,39 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { Resend } from "resend"
-import QuoteRequestEmail from "@/app/components/email-templates/quote-request-email"
-import UserReceiptEmail from "@/app/components/email-templates/user-receipt-email"
-import { contactFormSchema } from "@/lib/from-validation"
-import { rateLimiter, sanitizeInput, isValidEmail, isValidPhone } from "@/lib/security";
+import QuoteRequestEmail from "@/components/email-templates/quote-request-email"
+import UserReceiptEmail from "@/components/email-templates/user-receipt-email"
+import { contactFormSchema } from "@/lib/form-validation"
+import { rateLimiter, sanitizeInput, isValidEmail, isValidPhone } from "@/lib/security"
 
-// Initialize Resend with API key from environment variables
-const resend = new Resend(process.env.RESEND_API_KEY)
+// Validate environment variables at module level
+const validateEnvVars = () => {
+  const requiredVars = {
+    RESEND_API_KEY: process.env.RESEND_API_KEY,
+    SENDER_EMAIL: process.env.SENDER_EMAIL,
+    GOOGLE_USER: process.env.GOOGLE_USER,
+  }
+
+  const missing = Object.entries(requiredVars)
+    .filter(([_, value]) => !value)
+    .map(([key]) => key)
+
+  if (missing.length > 0) {
+    throw new Error(`Missing required environment variables: ${missing.join(", ")}`)
+  }
+
+  return requiredVars
+}
+
+// Initialize Resend with proper error handling
+let resend: Resend | null = null
+
+try {
+  const envVars = validateEnvVars()
+  resend = new Resend(envVars.RESEND_API_KEY)
+} catch (error) {
+  console.error("Failed to initialize Resend:", error)
+  // Don't throw here - let the route handler deal with it
+}
 
 // Rate limiting configuration
 const RATE_LIMIT = {
@@ -16,6 +43,18 @@ const RATE_LIMIT = {
 
 export async function POST(request: NextRequest) {
   try {
+    // Check if Resend is properly initialized
+    if (!resend) {
+      console.error("Resend not initialized - missing environment variables")
+      return NextResponse.json(
+        {
+          error: "Email service unavailable. Please contact us directly at (845) 358-2037.",
+          fallback: true,
+        },
+        { status: 503 },
+      )
+    }
+
     // Get client IP for rate limiting
     const clientIP = request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip") || "unknown"
 
@@ -83,7 +122,7 @@ export async function POST(request: NextRequest) {
       await resend.emails.send({
         from: `${userFullName} <${process.env.SENDER_EMAIL}>`,
         to: process.env.GOOGLE_USER as string,
-        reply_to: email,
+        replyTo: email,
         subject: `New Quote Request from ${firstName} ${lastName} (${location})`,
         react: QuoteRequestEmail({
           firstName,
@@ -122,11 +161,23 @@ export async function POST(request: NextRequest) {
       )
     } catch (emailError) {
       console.error("Error sending email:", emailError)
-      return NextResponse.json({ error: "Failed to send email" }, { status: 500 })
+      return NextResponse.json(
+        {
+          error: "Failed to send email. Please contact us directly at (845) 358-2037.",
+          fallback: true,
+        },
+        { status: 500 },
+      )
     }
   } catch (error) {
     console.error("Unexpected error:", error)
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+    return NextResponse.json(
+      {
+        error: "Internal server error. Please contact us directly at (845) 358-2037.",
+        fallback: true,
+      },
+      { status: 500 },
+    )
   }
 }
 
