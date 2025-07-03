@@ -7,8 +7,22 @@ import { contactFormSchema } from "@/lib/from-validation"
 // Initialize Resend with API key from environment variables
 const resend = new Resend(process.env.RESEND_API_KEY)
 
+// Rate limiting configuration
+const RATE_LIMIT = {
+  maxRequests: 5, // Max 5 quote requests per window
+  windowMs: 15 * 60 * 1000, // 15 minutes
+}
+
 export async function POST(request: NextRequest) {
   try {
+    // Get client IP for rate limiting
+    const clientIP = request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip") || "unknown"
+
+    // Apply rate limiting
+    if (!rateLimiter.isAllowed(`quote:${clientIP}`, RATE_LIMIT.maxRequests, RATE_LIMIT.windowMs)) {
+      return NextResponse.json({ error: "Too many quote requests. Please try again later." }, { status: 429 })
+    }
+
     // Step 1: Parse the request body safely
     let data
     try {
@@ -17,9 +31,36 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid request body" }, { status: 400 })
     }
 
-    // Step 2: Validate the input data with Zod
+    // Step 2: Sanitize inputs
+    const sanitizedData = {
+      ...data,
+      firstName: sanitizeInput(data.firstName || ""),
+      lastName: sanitizeInput(data.lastName || ""),
+      email: sanitizeInput(data.email || ""),
+      phone: sanitizeInput(data.phone || ""),
+      company: sanitizeInput(data.company || ""),
+      location: sanitizeInput(data.location || ""),
+      message: sanitizeInput(data.message || ""),
+    }
+
+    // Step 3: Additional security validations
+    if (!isValidEmail(sanitizedData.email)) {
+      return NextResponse.json({ error: "Invalid email address" }, { status: 400 })
+    }
+
+    if (!isValidPhone(sanitizedData.phone)) {
+      return NextResponse.json({ error: "Invalid phone number" }, { status: 400 })
+    }
+
+    // Check for honeypot field (anti-bot)
+    if (data.website && data.website.trim() !== "") {
+      console.log("Bot detected via honeypot field")
+      return NextResponse.json({ error: "Invalid submission" }, { status: 400 })
+    }
+
+    // Step 4: Validate with Zod schema
     try {
-      contactFormSchema.parse(data)
+      contactFormSchema.parse(sanitizedData)
     } catch (validationError: any) {
       return NextResponse.json(
         {
@@ -30,10 +71,10 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Step 3: Extract data
-    const { firstName, lastName, email, phone, company, location, message, uploadedFiles } = data
+    // Step 5: Extract data
+    const { firstName, lastName, email, phone, company, location, message, uploadedFiles } = sanitizedData
 
-    // Step 4: Send emails using Resend
+    // Step 6: Send emails using Resend
     try {
       const userFullName = `${firstName} ${lastName}`
 
@@ -41,7 +82,7 @@ export async function POST(request: NextRequest) {
       await resend.emails.send({
         from: `${userFullName} <${process.env.SENDER_EMAIL}>`,
         to: process.env.GOOGLE_USER as string,
-        reply_to: email,
+        replyTo: email,
         subject: `New Quote Request from ${firstName} ${lastName} (${location})`,
         react: QuoteRequestEmail({
           firstName,

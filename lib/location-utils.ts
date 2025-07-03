@@ -88,16 +88,12 @@ export const calculateDistance = (lat1: number, lng1: number, lat2: number, lng2
 
 export const isWithinServiceArea = (userLat: number, userLng: number): boolean => {
   const distanceFromNyack = calculateDistance(userLat, userLng, NYACK_COORDS.lat, NYACK_COORDS.lng)
-  console.log(`Distance from Nyack: ${distanceFromNyack.toFixed(2)} miles`)
   return distanceFromNyack <= SERVICE_RADIUS_MILES
 }
 
 export const findNearestLocation = (userLat: number, userLng: number): string => {
-  console.log(`Finding nearest location for coordinates: ${userLat}, ${userLng}`)
-
   // First check if user is within service area
   if (!isWithinServiceArea(userLat, userLng)) {
-    console.log("User is outside 15-mile service area, defaulting to Nyack")
     return "Nyack"
   }
 
@@ -106,60 +102,65 @@ export const findNearestLocation = (userLat: number, userLng: number): string =>
 
   locationCoords.forEach((location) => {
     const distance = calculateDistance(userLat, userLng, location.lat, location.lng)
-    console.log(`Distance to ${location.name}: ${distance.toFixed(2)} miles`)
-
     if (distance < shortestDistance) {
       shortestDistance = distance
       nearestLocation = location.name
     }
   })
 
-  console.log(`Nearest location within service area: ${nearestLocation} (${shortestDistance.toFixed(2)} miles)`)
   return nearestLocation
 }
 
 export const detectLocationByIP = async (): Promise<string> => {
   try {
-    console.log("Attempting IP-based location detection...")
+    // Add timeout and better error handling
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 2000) // 2 second timeout
 
-    const response = await fetch("https://ipapi.co/json/")
+    const response = await fetch("https://ipapi.co/json/", {
+      signal: controller.signal,
+      headers: {
+        Accept: "application/json",
+      },
+    })
+
+    clearTimeout(timeoutId)
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
     const data = await response.json()
-
-    console.log("IP location data:", data)
 
     if (data.latitude && data.longitude) {
       const userLat = Number.parseFloat(data.latitude)
       const userLng = Number.parseFloat(data.longitude)
 
-      console.log(`IP-based coordinates: ${userLat}, ${userLng}`)
+      // Validate coordinates
+      if (isNaN(userLat) || isNaN(userLng)) {
+        throw new Error("Invalid coordinates from IP service")
+      }
 
       // Check if within service area first
       if (!isWithinServiceArea(userLat, userLng)) {
-        console.log("IP location is outside service area, defaulting to Nyack")
         return "Nyack"
       }
 
-      const nearestLocation = findNearestLocation(userLat, userLng)
-      console.log(`IP-based nearest location: ${nearestLocation}`)
-      return nearestLocation
+      return findNearestLocation(userLat, userLng)
     }
 
-    // Fallback: try to match city name if coordinates aren't available
-    if (data.city) {
-      console.log(`Trying to match city: ${data.city}`)
+    // Fallback: try to match city name
+    if (data.city && typeof data.city === "string") {
       const matchedLocation = locations.find(
         (loc) =>
           loc.toLowerCase().includes(data.city.toLowerCase()) || data.city.toLowerCase().includes(loc.toLowerCase()),
       )
 
       if (matchedLocation) {
-        console.log(`IP-based city match: ${matchedLocation}`)
         return matchedLocation
       }
     }
 
-    // Final fallback
-    console.log("No IP-based location match found, defaulting to Nyack")
     return "Nyack"
   } catch (error) {
     console.log("IP location detection failed:", error)
