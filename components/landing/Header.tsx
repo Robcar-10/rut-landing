@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button"
 import { Printer, Phone } from "lucide-react"
 import { mainNavLinks } from "@/lib/constants"
 import { MobileNav } from "./MobileNav"
+import Image from "next/image"
+
 
 interface HeaderProps {
   currentLocation: string
@@ -16,13 +18,17 @@ export const Header = ({ currentLocation }: HeaderProps) => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between py-4">
           {/* Logo */}
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-purple-400 to-pink-400 rounded transform rotate-12 flex items-center justify-center">
-              <Printer className="w-4 h-4 text-white" />
-            </div>
-            <span className="text-lg sm:text-xl font-bold text-gray-800 tracking-wide">ROLLED UP TEES</span>
-          </div>
-
+          {/* Logo */}
+          <Link href="/" className="flex items-center">
+            <Image
+              src="/images/rolled-up-tees-logo.svg"
+              alt="Rolled Up Tees - Custom Screen Printing & Embroidery"
+              width={180}
+              height={33}
+              className="h-8 w-auto sm:h-9 lg:h-10"
+              priority
+            />
+          </Link>
           {/* Desktop Navigation */}
           <nav className="hidden md:flex space-x-6 lg:space-x-8">
             {mainNavLinks.map((link) => (

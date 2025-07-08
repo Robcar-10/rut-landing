@@ -3,12 +3,12 @@ import { Printer, Palette, Monitor, Store, Phone, Mail, MapPin } from "lucide-re
 export const mainNavLinks = [
   {
     title: "Screen Printing",
-    route: "/screen-printing",
+    route: "https://rolleduptees.com/screen-printing",
     icon: Printer,
   },
   {
     title: "Embroidery",
-    route: "/custom-embroidery",
+    route: "https://rolleduptees.com/custom-embroidery",
     icon: Palette,
   },
   {

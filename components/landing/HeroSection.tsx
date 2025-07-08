@@ -77,10 +77,13 @@ export const HeroSection = ({ currentLocation }: HeroSectionProps) => {
           Get Free Quote
         </Button>
         <Button
+          asChild
           variant="outline"
           className="border-purple-300 text-purple-600 hover:bg-purple-50 px-6 sm:px-8 py-3 sm:py-4 rounded-full text-base sm:text-lg bg-transparent font-semibold hero-button"
         >
-          View Our Work
+          <a href="https://www.instagram.com/rolleduptees" target="_blank" rel="noopener noreferrer">
+            View Our Work
+          </a>
         </Button>
       </div>
     </div>

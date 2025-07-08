@@ -9,6 +9,7 @@ import { Separator } from "@/components/ui/separator"
 import { Menu } from "lucide-react"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 import { mainNavLinks, contactInfo } from "@/lib/constants"
+import Image from "next/image"
 
 interface MobileNavProps {
   currentLocation: string
@@ -31,9 +32,16 @@ export const MobileNav = ({ currentLocation }: MobileNavProps) => {
             {/* Header */}
             <SheetHeader className="p-4 border-b">
               <div className="flex items-center justify-between">
-                <SheetTitle className="text-lg font-semibold bg-gradient-to-r from-[#FF6452] to-[#B221F6] bg-clip-text text-transparent">
-                  ROLLED UP TEES
-                </SheetTitle>
+                <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+                <Link href="/" onClick={() => setIsOpen(false)}>
+                  <Image
+                    src="/images/rolled-up-tees-logo.svg"
+                    alt="Rolled Up Tees - Custom Screen Printing & Embroidery"
+                    width={160}
+                    height={30}
+                    className="h-7 w-auto"
+                  />
+                </Link>
               </div>
             </SheetHeader>
 
@@ -69,8 +77,10 @@ export const MobileNav = ({ currentLocation }: MobileNavProps) => {
                 >
                   Get Free Quote
                 </Button>
-                <Button variant="outline" className="w-full bg-transparent" onClick={() => setIsOpen(false)} asChild>
-                  <Link href="https://instagram.com/rolleduptees">View Our Work</Link>
+                <Button variant="outline" className="w-full bg-transparent" asChild>
+                  <a href="https://www.instagram.com/rolleduptees" target="_blank" rel="noopener noreferrer">
+                    View Our Work
+                  </a>
                 </Button>
               </div>
 
