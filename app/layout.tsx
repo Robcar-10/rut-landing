@@ -3,6 +3,7 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import { getCSPHeader } from "@/lib/security"
+import { Analytics } from "@vercel/analytics/next"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -217,7 +218,9 @@ export default function RootLayout({
         {/* Canonical URL */}
         <link rel="canonical" href="https://rolleduptees.com" />
       </head>
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>{children}
+         <Analytics />
+      </body>
     </html>
   )
 }
