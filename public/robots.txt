@@ -2,7 +2,7 @@ User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://rolleduptees.com/sitemap.xml
+Sitemap: https://nyackscreenprinting.com/sitemap.xml
 
 # Crawl-delay for polite crawling
 Crawl-delay: 1
