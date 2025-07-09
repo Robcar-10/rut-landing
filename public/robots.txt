@@ -23,10 +23,31 @@ Disallow: /api/
 Disallow: /_next/
 Disallow: /private/
 
-# Allow important pages
+# Allow important location pages
 Allow: /
-Allow: /nyack
-Allow: /pearl-river
-Allow: /spring-valley
-Allow: /nanuet
+Allow: /ramapo
+Allow: /clarkstown
+Allow: /orangetown
+Allow: /haverstraw
 Allow: /new-city
+Allow: /spring-valley
+Allow: /monsey
+Allow: /nanuet
+Allow: /pearl-river
+Allow: /stony-point
+Allow: /west-haverstraw
+Allow: /valley-cottage
+Allow: /congers
+Allow: /blauvelt
+Allow: /west-nyack
+Allow: /piermont
+Allow: /upper-nyack
+Allow: /ossining
+Allow: /sleepy-hollow
+Allow: /tarrytown
+Allow: /dobbs-ferry
+Allow: /irvington
+Allow: /montvale
+Allow: /westwood
+Allow: /hillsdale
+Allow: /northvale
