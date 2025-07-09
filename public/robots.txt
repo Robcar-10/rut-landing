@@ -23,8 +23,38 @@ Disallow: /api/
 Disallow: /_next/
 Disallow: /private/
 
+# Allow important service pages
+Allow: /services/screen-printing-near-me
+Allow: /services/custom-embroidery
+Allow: /services/fast-turnaround
+Allow: /services/bulk-printing
+Allow: /services/team-t-shirts
+Allow: /services/graduation-shirts
+Allow: /services/bachelorette-party-shirts
+Allow: /services/family-reunion-shirts
+Allow: /services/event-t-shirts
+Allow: /services/fundraising-shirts
+Allow: /services/memorial-shirts
+Allow: /services/sports-jerseys
+Allow: /services/corporate-uniforms
+Allow: /services/business-apparel
+Allow: /services/promotional-products
+Allow: /services/company-shirts
+Allow: /services/uniform-printing
+Allow: /services/fire-department-shirts
+Allow: /services/police-shirts
+Allow: /services/ems-shirts
+Allow: /services/firefighter-uniforms
+Allow: /services/police-uniforms
+Allow: /services/paramedic-shirts
+Allow: /services/first-responder-apparel
+Allow: /services/safety-vests
+Allow: /services/reflective-clothing
+Allow: /services/custom-hoodies
+Allow: /services/custom-decals
+Allow: /services/rush-orders
+
 # Allow important location pages
-Allow: /
 Allow: /ramapo
 Allow: /clarkstown
 Allow: /orangetown
