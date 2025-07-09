@@ -27,15 +27,16 @@ class RateLimiter {
 
 export const rateLimiter = new RateLimiter()
 
-// Input sanitization
+// Input sanitization - Updated to preserve spaces
 export const sanitizeInput = (input: string): string => {
   if (typeof input !== "string") return ""
 
   return input
-    .trim()
+    .trim() // Remove leading/trailing whitespace
     .replace(/[<>]/g, "") // Remove potential HTML tags
     .replace(/javascript:/gi, "") // Remove javascript: protocol
     .replace(/on\w+=/gi, "") // Remove event handlers
+    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "") // Remove control characters but keep normal spaces
     .substring(0, 1000) // Limit length
 }
 

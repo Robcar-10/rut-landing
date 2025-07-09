@@ -10,7 +10,7 @@ import { Upload, X, FileText, CheckCircle, AlertCircle, ImageIcon, Phone, Mail }
 import { contactFormSchema, type ContactFormData } from "@/lib/form-validation"
 import { trackQuoteRequest, trackFileUpload } from "@/lib/analytics"
 import { useCookieConsent } from "@/hooks/useCookieConsent"
-import { validateFile, sanitizeInput, isValidEmail, isValidPhone } from "@/lib/security"
+import { validateFile, isValidEmail, isValidPhone } from "@/lib/security"
 
 interface ContactFormProps {
   currentLocation: string
@@ -63,8 +63,25 @@ export const ContactForm = ({ currentLocation }: ContactFormProps) => {
   const honeypot = createClientHoneypot()
 
   const handleInputChange = (field: keyof ContactFormData, value: any) => {
-    // Sanitize input
-    const sanitizedValue = typeof value === "string" ? sanitizeInput(value) : value
+    // For most text fields, just do basic sanitization that preserves spaces
+    let sanitizedValue = value
+
+    if (typeof value === "string") {
+      // For email and phone, we can be more strict
+      if (field === "email") {
+        sanitizedValue = value.trim().toLowerCase()
+      } else if (field === "phone") {
+        // Allow spaces, dashes, parentheses, and plus for phone formatting
+        sanitizedValue = value.replace(/[^\d\s\-$$$$+.]/g, "")
+      } else {
+        // For names, company, location, message - preserve spaces and normal punctuation
+        sanitizedValue = value
+          .replace(/[<>]/g, "") // Remove HTML tags
+          .replace(/javascript:/gi, "") // Remove javascript protocol
+          .replace(/on\w+=/gi, "") // Remove event handlers
+          .substring(0, field === "message" ? 2000 : 200) // Different limits for different fields
+      }
+    }
 
     setFormData((prev) => ({ ...prev, [field]: sanitizedValue }))
     // Clear error when user starts typing

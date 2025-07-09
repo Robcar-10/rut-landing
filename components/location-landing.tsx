@@ -16,7 +16,6 @@ import { Footer } from "./landing/Footer"
 import { StickyMobileElements } from "./landing/StickyMobileElements"
 import { CookieConsent } from "./landing/CookieConsent"
 
-
 interface LocationLandingProps {
   location?: string
 }
@@ -78,11 +77,6 @@ export default function LocationLanding({ location }: LocationLandingProps) {
         console.log("Should show cookie consent:", shouldShow)
         return shouldShow ? <CookieConsent onAccept={updatePreferences} /> : null
       })()}
-
-      
-
-
-    
     </div>
   )
 }
