@@ -15,7 +15,6 @@ import { UploadSection } from "./landing/UploadSection"
 import { Footer } from "./landing/Footer"
 import { StickyMobileElements } from "./landing/StickyMobileElements"
 import { CookieConsent } from "./landing/CookieConsent"
-import { AnalyticsDebug } from "./analytics-debug"
 
 interface LocationLandingProps {
   location?: string
@@ -81,7 +80,7 @@ export default function LocationLanding({ location }: LocationLandingProps) {
 
       
       {/* Analytics Debug Component - Only shows in development */}
-      <AnalyticsDebug />
+    
     </div>
   )
 }
