@@ -63,8 +63,7 @@ export const HeroSection = ({ currentLocation }: HeroSectionProps) => {
 
         <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
           <p className="text-gray-800 font-medium text-sm sm:text-base">
-            🎯 <strong>Limited Time:</strong> Free design consultation for {currentLocation} businesses! Get your custom
-            quote in 24 hours or less.
+            🎯 <strong>Limited Time:</strong> First Order Discount for {currentLocation} businesses! New customers receive 15% off your first order of any custom apparel. Minimum order of 18 items required.
           </p>
         </div>
       </div>
