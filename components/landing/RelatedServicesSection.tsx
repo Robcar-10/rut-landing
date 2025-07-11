@@ -34,13 +34,13 @@ export const RelatedServicesSection = ({ serviceInfo, currentLocation }: Related
           {relatedServices.map((service, index) => (
             <div
               key={service.slug}
-              className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 related-card overflow-hidden group"
+              className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 related-card overflow-hidden group min-h-[280px] flex flex-col"
             >
-              <div className="p-6">
+              <div className="p-6 flex-1 flex flex-col">
                 <h3 className="text-xl font-semibold text-gray-900 mb-3 group-hover:text-purple-600 transition-colors">
                   {service.title}
                 </h3>
-                <p className="text-gray-600 text-sm mb-4 leading-relaxed">{service.description.substring(0, 120)}...</p>
+                <p className="text-gray-600 text-sm mb-4 leading-relaxed flex-1">{service.description}</p>
 
                 {/* Features */}
                 <div className="space-y-2 mb-4">
@@ -55,7 +55,7 @@ export const RelatedServicesSection = ({ serviceInfo, currentLocation }: Related
                 <Button
                   asChild
                   variant="outline"
-                  className="w-full border-purple-300 text-purple-600 hover:bg-purple-50 bg-transparent group-hover:border-purple-400 transition-colors"
+                  className="w-full border-purple-300 text-purple-600 hover:bg-purple-50 bg-transparent group-hover:border-purple-400 transition-colors mt-auto"
                 >
                   <Link href={`/services/${service.slug}`} className="flex items-center justify-center gap-2">
                     Learn More

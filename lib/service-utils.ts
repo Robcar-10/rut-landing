@@ -55,7 +55,7 @@ export const services: ServiceInfo[] = [
     heroSubtitle: "Quality printing when you need it most",
     description:
       "When deadlines are tight, our fast turnaround printing services deliver without compromising quality. We specialize in rush orders for events, emergencies, and last-minute promotional needs.",
-    features: ["Same-day service available", "24-48 hour rush orders", "Emergency printing", "Weekend availability"],
+    features: ["Same-day service available", "48-72hr  rush orders", "Emergency printing", "Weekend availability"],
     category: "specialty",
     keywords: ["fast turnaround printing", "rush orders", "same day printing", "emergency printing"],
     relatedServices: ["screen-printing-near-me", "event-t-shirts", "promotional-products"],

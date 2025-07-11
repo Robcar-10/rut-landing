@@ -217,7 +217,20 @@ export default function RootLayout({
 
         {/* Canonical URL */}
         <link rel="canonical" href="https://rolleduptees.com" />
+
+        {/* <!-- Google tag (gtag.js) --> */}
+          <script async src="https://www.googletagmanager.com/gtag/js?id=G-HQ9984FZ6W"></script>
+          <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'G-HQ9984FZ6W');
+          </script>
+          
       </head>
+
+
       <body className={inter.className}>{children}
          <Analytics />
       </body>
