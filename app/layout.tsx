@@ -3,7 +3,6 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import { getCSPHeader } from "@/lib/security"
-import { Analytics } from "@vercel/analytics/next"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -183,6 +182,9 @@ const jsonLd = {
 // Generate CSP header at build time
 const cspHeader = getCSPHeader()
 
+// Get GA Measurement ID from environment variable
+const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID
+
 export default function RootLayout({
   children,
 }: {
@@ -191,6 +193,26 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        {/* Google Analytics - Must be first for proper tracking */}
+        {GA_MEASUREMENT_ID && (
+          <>
+            <script async src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`} />
+            <script
+              dangerouslySetInnerHTML={{
+                __html: `
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag(){dataLayer.push(arguments);}
+                  gtag('js', new Date());
+                  gtag('config', '${GA_MEASUREMENT_ID}', {
+                    page_title: document.title,
+                    page_location: window.location.href,
+                  });
+                `,
+              }}
+            />
+          </>
+        )}
+
         {/* Security Headers */}
         <meta httpEquiv="Content-Security-Policy" content={cspHeader} />
         <meta httpEquiv="X-Content-Type-Options" content="nosniff" />
@@ -217,23 +239,8 @@ export default function RootLayout({
 
         {/* Canonical URL */}
         <link rel="canonical" href="https://rolleduptees.com" />
-
-        {/* <!-- Google tag (gtag.js) --> */}
-          <script async src="https://www.googletagmanager.com/gtag/js?id=G-HQ9984FZ6W"></script>
-          <script>
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-
-            gtag('config', 'G-HQ9984FZ6W');
-          </script>
-          
       </head>
-
-
-      <body className={inter.className}>{children}
-         <Analytics />
-      </body>
+      <body className={inter.className}>{children}</body>
     </html>
   )
 }
