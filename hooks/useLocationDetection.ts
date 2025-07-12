@@ -28,7 +28,6 @@ export const useLocationDetection = (initialLocation?: string): UseLocationDetec
   const { hasConsent } = useCookieConsent()
   const hasInitialized = useRef(false)
   const isDetecting = useRef(false)
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   // Stable function to update location
   const updateLocation = useCallback(
@@ -48,19 +47,6 @@ export const useLocationDetection = (initialLocation?: string): UseLocationDetec
     },
     [hasConsent],
   )
-
-  // Function to stop detecting and clean up
-  const stopDetecting = useCallback(() => {
-    console.log("Stopping location detection...")
-    setIsDetectingLocation(false)
-    isDetecting.current = false
-
-    // Clear any active timeout
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current)
-      timeoutRef.current = null
-    }
-  }, [])
 
   // Initialize location detection once
   useEffect(() => {
@@ -84,7 +70,6 @@ export const useLocationDetection = (initialLocation?: string): UseLocationDetec
           console.log("Using URL/initial location:", displayLocation)
           updateLocation(displayLocation, "initial")
           setGeolocationStatus("success")
-          stopDetecting()
           return
         }
 
@@ -106,7 +91,6 @@ export const useLocationDetection = (initialLocation?: string): UseLocationDetec
             const newUrl = new URL(window.location.href)
             newUrl.searchParams.set("location", ipLocation.toLowerCase().replace(" ", "-"))
             window.history.replaceState({}, "", newUrl.toString())
-            stopDetecting()
             return
           }
         } catch (error) {
@@ -122,7 +106,8 @@ export const useLocationDetection = (initialLocation?: string): UseLocationDetec
         updateLocation("Nyack", "error")
         setGeolocationStatus("error")
       } finally {
-        stopDetecting()
+        setIsDetectingLocation(false)
+        isDetecting.current = false
         hasInitialized.current = true
       }
     }
@@ -131,15 +116,12 @@ export const useLocationDetection = (initialLocation?: string): UseLocationDetec
     const timer = setTimeout(detectLocation, 100)
     return () => {
       clearTimeout(timer)
-      stopDetecting()
+      isDetecting.current = false
     }
-  }, [initialLocation, updateLocation, stopDetecting])
+  }, [initialLocation, updateLocation]) // Stable dependencies
 
   const requestGPSLocation = useCallback(() => {
-    if (isDetecting.current) {
-      console.log("Already detecting location, ignoring request")
-      return
-    }
+    if (isDetecting.current) return
 
     console.log("GPS location request triggered by user")
     setIsDetectingLocation(true)
@@ -149,7 +131,8 @@ export const useLocationDetection = (initialLocation?: string): UseLocationDetec
     if (!("geolocation" in navigator)) {
       console.log("Geolocation not supported")
       setGeolocationStatus("error")
-      stopDetecting()
+      setIsDetectingLocation(false)
+      isDetecting.current = false
       alert("Your browser doesn't support location detection. Please select your location manually.")
       return
     }
@@ -164,7 +147,8 @@ export const useLocationDetection = (initialLocation?: string): UseLocationDetec
           console.log("GPS location is outside service area, defaulting to Nyack")
           updateLocation("Nyack", "gps-outside")
           setGeolocationStatus("success")
-          stopDetecting()
+          setIsDetectingLocation(false)
+          isDetecting.current = false
           return
         }
 
@@ -178,13 +162,13 @@ export const useLocationDetection = (initialLocation?: string): UseLocationDetec
         const newUrl = new URL(window.location.href)
         newUrl.searchParams.set("location", nearestLocation.toLowerCase().replace(" ", "-"))
         window.history.replaceState({}, "", newUrl.toString())
-
-        stopDetecting()
       } catch (error) {
         console.error("Error processing GPS location:", error)
         updateLocation("Nyack", "gps-error")
         setGeolocationStatus("error")
-        stopDetecting()
+      } finally {
+        setIsDetectingLocation(false)
+        isDetecting.current = false
       }
     }
 
@@ -203,38 +187,22 @@ export const useLocationDetection = (initialLocation?: string): UseLocationDetec
         case error.TIMEOUT:
           errorMessage += "Location request timed out. Please select your location manually."
           break
-        default:
-          errorMessage += "Please select your location manually."
       }
 
       alert(errorMessage)
-      stopDetecting()
+      setIsDetectingLocation(false)
+      isDetecting.current = false
     }
 
     const options: PositionOptions = {
-      enableHighAccuracy: true, // More accurate for better results
-      timeout: 15000, // 15 second timeout
-      maximumAge: 60000, // 1 minute cache
+      enableHighAccuracy: false, // Faster, less accurate
+      timeout: 10000, // 10 second timeout
+      maximumAge: 300000, // 5 minutes cache
     }
 
-    try {
-      // Use getCurrentPosition instead of watchPosition to avoid continuous updates
-      navigator.geolocation.getCurrentPosition(successCallback, errorCallback, options)
-
-      // Fallback timeout to ensure we don't get stuck
-      timeoutRef.current = setTimeout(() => {
-        if (isDetecting.current) {
-          console.log("GPS detection timeout reached, stopping...")
-          setGeolocationStatus("error")
-          stopDetecting()
-        }
-      }, 16000) // Slightly longer than the geolocation timeout
-    } catch (error) {
-      console.error("Error requesting GPS location:", error)
-      setGeolocationStatus("error")
-      stopDetecting()
-    }
-  }, [updateLocation, stopDetecting])
+    // Use getCurrentPosition instead of watchPosition to avoid continuous updates
+    navigator.geolocation.getCurrentPosition(successCallback, errorCallback, options)
+  }, [updateLocation])
 
   const handleSetCurrentLocation = useCallback(
     (location: string) => {
@@ -242,13 +210,6 @@ export const useLocationDetection = (initialLocation?: string): UseLocationDetec
     },
     [updateLocation],
   )
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      stopDetecting()
-    }
-  }, [stopDetecting])
 
   return {
     currentLocation,
