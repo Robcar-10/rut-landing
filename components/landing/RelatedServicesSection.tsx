@@ -3,28 +3,29 @@
 import { useEffect, useRef } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { ArrowRight } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import { ArrowRight, Star } from "lucide-react"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import Link from "next/link"
-import { services, type Service } from "@/lib/service-utils"
+import { getRelatedServices } from "@/lib/service-utils"
 
-gsap.registerPlugin(ScrollTrigger)
-
-interface RelatedServicesSectionProps {
-  currentService: Service
-  currentLocation: string
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger)
 }
 
-export function RelatedServicesSection({ currentService, currentLocation }: RelatedServicesSectionProps) {
+interface RelatedServicesSectionProps {
+  currentServiceSlug: string
+  className?: string
+}
+
+export default function RelatedServicesSection({ currentServiceSlug, className = "" }: RelatedServicesSectionProps) {
   const sectionRef = useRef<HTMLElement>(null)
   const cardsRef = useRef<HTMLDivElement[]>([])
-
-  // Get related services (exclude current service)
-  const relatedServices = services.filter((service) => service.slug !== currentService.slug).slice(0, 3) // Show only 3 related services
+  const relatedServices = getRelatedServices(currentServiceSlug)
 
   useEffect(() => {
-    if (!sectionRef.current) return
+    if (!sectionRef.current || relatedServices.length === 0) return
 
     const ctx = gsap.context(() => {
       // Animate section title
@@ -41,8 +42,8 @@ export function RelatedServicesSection({ currentService, currentLocation }: Rela
           ease: "power2.out",
           scrollTrigger: {
             trigger: ".related-title",
-            start: "top 80%",
-            end: "bottom 20%",
+            start: "top 85%",
+            end: "bottom 15%",
             toggleActions: "play none none reverse",
           },
         },
@@ -62,17 +63,17 @@ export function RelatedServicesSection({ currentService, currentLocation }: Rela
           scale: 1,
           duration: 0.6,
           ease: "power2.out",
-          stagger: 0.2,
+          stagger: 0.1,
           scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top 70%",
-            end: "bottom 30%",
+            trigger: ".related-cards",
+            start: "top 85%",
+            end: "bottom 15%",
             toggleActions: "play none none reverse",
           },
         },
       )
 
-      // Add hover animations for cards
+      // Add hover animations
       cardsRef.current.forEach((card, index) => {
         if (!card) return
 
@@ -97,7 +98,7 @@ export function RelatedServicesSection({ currentService, currentLocation }: Rela
         card.addEventListener("mouseenter", handleMouseEnter)
         card.addEventListener("mouseleave", handleMouseLeave)
 
-        // Cleanup function
+        // Cleanup
         return () => {
           card.removeEventListener("mouseenter", handleMouseEnter)
           card.removeEventListener("mouseleave", handleMouseLeave)
@@ -106,63 +107,82 @@ export function RelatedServicesSection({ currentService, currentLocation }: Rela
     }, sectionRef)
 
     return () => ctx.revert()
-  }, [])
+  }, [relatedServices.length])
 
   if (relatedServices.length === 0) {
     return null
   }
 
   return (
-    <section ref={sectionRef} className="py-16 bg-gray-50">
+    <section ref={sectionRef} className={`py-16 bg-gray-50 ${className}`}>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <h2 className="related-title text-3xl font-bold text-gray-900 mb-4">Other Services You Might Need</h2>
+          <h2 className="related-title text-3xl md:text-4xl font-bold text-gray-900 mb-4">Related Services</h2>
           <p className="related-title text-lg text-gray-600 max-w-2xl mx-auto">
-            Explore our complete range of custom printing and embroidery services in {currentLocation}
+            Explore our other professional printing and customization services
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="related-cards grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
           {relatedServices.map((service, index) => (
             <Card
               key={service.slug}
               ref={(el) => {
                 if (el) cardsRef.current[index] = el
               }}
-              className="group cursor-pointer border-0 shadow-lg hover:shadow-xl transition-all duration-300 min-h-[320px] flex flex-col"
+              className="group h-full flex flex-col hover:shadow-xl transition-all duration-300 border-0 shadow-lg bg-white"
             >
               <CardHeader className="pb-4">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="p-2 bg-purple-100 rounded-lg group-hover:bg-purple-200 transition-colors">
-                    <service.icon className="w-6 h-6 text-purple-600" />
+                <div className="flex items-start justify-between mb-2">
+                  <Badge variant="secondary" className="mb-2">
+                    {service.category === "first-responder"
+                      ? "First Responder"
+                      : service.category === "printing"
+                        ? "Printing"
+                        : service.category === "embroidery"
+                          ? "Embroidery"
+                          : service.category === "business"
+                            ? "Business"
+                            : service.category === "events"
+                              ? "Events"
+                              : "Specialty"}
+                  </Badge>
+                  <div className="flex items-center text-yellow-500">
+                    <Star className="w-4 h-4 fill-current" />
+                    <Star className="w-4 h-4 fill-current" />
+                    <Star className="w-4 h-4 fill-current" />
+                    <Star className="w-4 h-4 fill-current" />
+                    <Star className="w-4 h-4 fill-current" />
                   </div>
-                  <CardTitle className="text-xl font-semibold text-gray-900 group-hover:text-purple-600 transition-colors">
-                    {service.title}
-                  </CardTitle>
                 </div>
+                <CardTitle className="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
+                  {service.title}
+                </CardTitle>
+                <CardDescription className="text-gray-600 line-clamp-2">{service.heroSubtitle}</CardDescription>
               </CardHeader>
 
               <CardContent className="flex-1 flex flex-col">
-                <CardDescription className="text-gray-600 text-base leading-relaxed mb-6 flex-1">
-                  {service.description}
-                </CardDescription>
+                <p className="text-gray-700 mb-4 flex-1 leading-relaxed">{service.description}</p>
 
-                <div className="space-y-4 mt-auto">
-                  {/* Key features */}
+                <div className="mb-4">
+                  <h4 className="font-semibold text-gray-900 mb-2">Key Features:</h4>
                   <div className="flex flex-wrap gap-2">
-                    {service.features?.slice(0, 3).map((feature, featureIndex) => (
-                      <span
-                        key={featureIndex}
-                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800"
-                      >
+                    {service.features.slice(0, 3).map((feature, featureIndex) => (
+                      <Badge key={featureIndex} variant="outline" className="text-xs">
                         {feature}
-                      </span>
+                      </Badge>
                     ))}
+                    {service.features.length > 3 && (
+                      <Badge variant="outline" className="text-xs">
+                        +{service.features.length - 3} more
+                      </Badge>
+                    )}
                   </div>
+                </div>
 
-                  {/* CTA Button */}
-                  <Link href={`/services/${service.slug}`} className="block">
-                    <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white group-hover:bg-purple-700 transition-all duration-300">
+                <div className="mt-auto">
+                  <Link href={`/services/${service.slug}`}>
+                    <Button className="w-full group-hover:bg-blue-600 transition-colors">
                       Learn More
                       <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                     </Button>
@@ -173,16 +193,11 @@ export function RelatedServicesSection({ currentService, currentLocation }: Rela
           ))}
         </div>
 
-        {/* View All Services CTA */}
-        <div className="text-center mt-12">
+        <div className="text-center">
           <Link href="/services">
-            <Button
-              variant="outline"
-              size="lg"
-              className="border-purple-600 text-purple-600 hover:bg-purple-600 hover:text-white transition-all duration-300 bg-transparent"
-            >
+            <Button variant="outline" size="lg" className="group bg-transparent">
               View All Services
-              <ArrowRight className="ml-2 w-4 h-4" />
+              <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Button>
           </Link>
         </div>

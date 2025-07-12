@@ -55,7 +55,7 @@ export const services: ServiceInfo[] = [
     heroSubtitle: "Quality printing when you need it most",
     description:
       "When deadlines are tight, our fast turnaround printing services deliver without compromising quality. We specialize in rush orders for events, emergencies, and last-minute promotional needs.",
-    features: ["Same-day service available", "48-72hr  rush orders", "Emergency printing", "Weekend availability"],
+    features: ["Same-day service available", "24-48 hour rush orders", "Emergency printing", "Weekend availability"],
     category: "specialty",
     keywords: ["fast turnaround printing", "rush orders", "same day printing", "emergency printing"],
     relatedServices: ["screen-printing-near-me", "event-t-shirts", "promotional-products"],
@@ -482,14 +482,14 @@ export const isValidServiceSlug = (slug: string): boolean => {
   return services.some((service) => service.slug === slug)
 }
 
-// Get related services
+// Get related services with proper error handling
 export const getRelatedServices = (currentSlug: string): ServiceInfo[] => {
   const currentService = getServiceBySlug(currentSlug)
-  if (!currentService) return []
+  if (!currentService || !currentService.relatedServices) return []
 
   return currentService.relatedServices
     .map((slug) => getServiceBySlug(slug))
-    .filter((service): service is ServiceInfo => service !== undefined)
+    .filter((service): service is ServiceInfo => service !== undefined && service.slug !== undefined)
     .slice(0, 3) // Limit to 3 related services
 }
 
