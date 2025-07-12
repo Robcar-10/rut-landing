@@ -1,179 +1,247 @@
 "use client"
 
 import { useState, useEffect, useCallback, useRef } from "react"
-import { locations, findNearestLocation, type LocationInfo } from "@/lib/location-utils"
+import {
+  findNearestLocation,
+  detectLocationByIP,
+  isWithinServiceArea,
+  getLocationDisplayName,
+  isValidServiceLocation,
+} from "@/lib/location-utils"
+import { trackLocationChange } from "@/lib/analytics"
+import { useCookieConsent } from "@/hooks/useCookieConsent"
 
-export interface GeolocationStatus {
-  supported: boolean
-  permission: "granted" | "denied" | "prompt" | "unknown"
-  error: string | null
+export type GeolocationStatus = "idle" | "detecting" | "success" | "denied" | "error" | "ip-detected"
+
+export interface UseLocationDetectionReturn {
+  currentLocation: string
+  isDetectingLocation: boolean
+  geolocationStatus: GeolocationStatus
+  requestGPSLocation: () => void
+  setCurrentLocation: (location: string) => void
 }
 
-export function useLocationDetection() {
-  const [currentLocation, setCurrentLocation] = useState<LocationInfo>(locations[0]) // Default to first location
+export const useLocationDetection = (initialLocation?: string): UseLocationDetectionReturn => {
+  const [currentLocation, setCurrentLocationState] = useState("Nyack")
   const [isDetectingLocation, setIsDetectingLocation] = useState(false)
-  const [geolocationStatus, setGeolocationStatus] = useState<GeolocationStatus>({
-    supported: false,
-    permission: "unknown",
-    error: null,
-  })
-
-  const watchIdRef = useRef<number | null>(null)
+  const [geolocationStatus, setGeolocationStatus] = useState<GeolocationStatus>("idle")
+  const { hasConsent } = useCookieConsent()
+  const hasInitialized = useRef(false)
+  const isDetecting = useRef(false)
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
-  const isRequestingRef = useRef(false)
 
-  // Check geolocation support and permissions
-  useEffect(() => {
-    const checkGeolocationSupport = async () => {
-      if (!navigator.geolocation) {
-        setGeolocationStatus({
-          supported: false,
-          permission: "unknown",
-          error: "Geolocation is not supported by this browser",
-        })
-        return
-      }
+  // Stable function to update location
+  const updateLocation = useCallback(
+    (location: string, source: string) => {
+      if (isValidServiceLocation(location)) {
+        console.log(`Setting location to: ${location} (source: ${source})`)
+        setCurrentLocationState(location)
 
-      setGeolocationStatus((prev) => ({
-        ...prev,
-        supported: true,
-      }))
-
-      // Check permissions if available
-      if ("permissions" in navigator) {
-        try {
-          const permission = await navigator.permissions.query({ name: "geolocation" })
-          setGeolocationStatus((prev) => ({
-            ...prev,
-            permission: permission.state as "granted" | "denied" | "prompt",
-          }))
-
-          // Listen for permission changes
-          permission.addEventListener("change", () => {
-            setGeolocationStatus((prev) => ({
-              ...prev,
-              permission: permission.state as "granted" | "denied" | "prompt",
-            }))
-          })
-        } catch (error) {
-          console.warn("Could not query geolocation permission:", error)
+        // Track location change if consent given
+        if (hasConsent("analytics") && source !== "initial") {
+          trackLocationChange(location, source as any)
         }
+      } else {
+        console.log(`Invalid location: ${location}, using Nyack`)
+        setCurrentLocationState("Nyack")
       }
-    }
+    },
+    [hasConsent],
+  )
 
-    checkGeolocationSupport()
-  }, [])
-
-  // Cleanup function
+  // Function to stop detecting and clean up
   const stopDetecting = useCallback(() => {
+    console.log("Stopping location detection...")
     setIsDetectingLocation(false)
-    isRequestingRef.current = false
+    isDetecting.current = false
 
-    if (watchIdRef.current !== null) {
-      navigator.geolocation.clearWatch(watchIdRef.current)
-      watchIdRef.current = null
-    }
-
+    // Clear any active timeout
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current)
       timeoutRef.current = null
     }
   }, [])
 
-  // Request GPS location
+  // Initialize location detection once
+  useEffect(() => {
+    if (hasInitialized.current || isDetecting.current) return
+
+    const detectLocation = async () => {
+      if (isDetecting.current) return
+
+      console.log("Starting location detection...")
+      isDetecting.current = true
+      setIsDetectingLocation(true)
+      setGeolocationStatus("detecting")
+
+      try {
+        // Priority 1: Check URL params or initial location
+        const urlParams = new URLSearchParams(window.location.search)
+        const urlLocation = urlParams.get("location") || initialLocation
+
+        if (urlLocation) {
+          const displayLocation = getLocationDisplayName(urlLocation)
+          console.log("Using URL/initial location:", displayLocation)
+          updateLocation(displayLocation, "initial")
+          setGeolocationStatus("success")
+          stopDetecting()
+          return
+        }
+
+        // Priority 2: Try IP-based location detection with timeout
+        const ipDetectionPromise = detectLocationByIP()
+        const timeoutPromise = new Promise<string>((_, reject) =>
+          setTimeout(() => reject(new Error("IP detection timeout")), 3000),
+        )
+
+        try {
+          const ipLocation = await Promise.race([ipDetectionPromise, timeoutPromise])
+          console.log("IP detection result:", ipLocation)
+
+          if (ipLocation && ipLocation !== "Nyack") {
+            updateLocation(ipLocation, "ip")
+            setGeolocationStatus("ip-detected")
+
+            // Update URL with detected location
+            const newUrl = new URL(window.location.href)
+            newUrl.searchParams.set("location", ipLocation.toLowerCase().replace(" ", "-"))
+            window.history.replaceState({}, "", newUrl.toString())
+            stopDetecting()
+            return
+          }
+        } catch (error) {
+          console.log("IP detection failed or timed out:", error)
+        }
+
+        // Final fallback: Default to Nyack
+        console.log("Using default location: Nyack")
+        updateLocation("Nyack", "default")
+        setGeolocationStatus("idle")
+      } catch (error) {
+        console.error("Location detection error:", error)
+        updateLocation("Nyack", "error")
+        setGeolocationStatus("error")
+      } finally {
+        stopDetecting()
+        hasInitialized.current = true
+      }
+    }
+
+    // Small delay to prevent immediate execution
+    const timer = setTimeout(detectLocation, 100)
+    return () => {
+      clearTimeout(timer)
+      stopDetecting()
+    }
+  }, [initialLocation, updateLocation, stopDetecting])
+
   const requestGPSLocation = useCallback(() => {
-    if (!navigator.geolocation) {
-      setGeolocationStatus((prev) => ({
-        ...prev,
-        error: "Geolocation is not supported by this browser",
-      }))
+    if (isDetecting.current) {
+      console.log("Already detecting location, ignoring request")
       return
     }
 
-    if (isRequestingRef.current) {
-      return // Prevent multiple simultaneous requests
-    }
-
-    isRequestingRef.current = true
+    console.log("GPS location request triggered by user")
     setIsDetectingLocation(true)
-    setGeolocationStatus((prev) => ({ ...prev, error: null }))
+    setGeolocationStatus("detecting")
+    isDetecting.current = true
 
-    // Set a timeout to ensure we don't get stuck
-    timeoutRef.current = setTimeout(() => {
+    if (!("geolocation" in navigator)) {
+      console.log("Geolocation not supported")
+      setGeolocationStatus("error")
       stopDetecting()
-      setGeolocationStatus((prev) => ({
-        ...prev,
-        error: "Location request timed out. Please try again.",
-      }))
-    }, 15000) // 15 second timeout
-
-    const options = {
-      enableHighAccuracy: true,
-      timeout: 10000, // 10 second timeout
-      maximumAge: 300000, // 5 minutes cache
+      alert("Your browser doesn't support location detection. Please select your location manually.")
+      return
     }
 
     const successCallback = (position: GeolocationPosition) => {
       try {
+        console.log("GPS geolocation success:", position.coords)
         const { latitude, longitude } = position.coords
-        const nearestLocation = findNearestLocation(latitude, longitude)
 
-        if (nearestLocation) {
-          setCurrentLocation(nearestLocation)
-          setGeolocationStatus((prev) => ({
-            ...prev,
-            permission: "granted",
-            error: null,
-          }))
-        } else {
-          setGeolocationStatus((prev) => ({
-            ...prev,
-            error: "Could not find a nearby service location",
-          }))
+        // Check if user is within service area
+        if (!isWithinServiceArea(latitude, longitude)) {
+          console.log("GPS location is outside service area, defaulting to Nyack")
+          updateLocation("Nyack", "gps-outside")
+          setGeolocationStatus("success")
+          stopDetecting()
+          return
         }
+
+        const nearestLocation = findNearestLocation(latitude, longitude)
+        console.log(`GPS - Nearest location: ${nearestLocation}`)
+
+        updateLocation(nearestLocation, "gps")
+        setGeolocationStatus("success")
+
+        // Update URL with detected location
+        const newUrl = new URL(window.location.href)
+        newUrl.searchParams.set("location", nearestLocation.toLowerCase().replace(" ", "-"))
+        window.history.replaceState({}, "", newUrl.toString())
+
+        stopDetecting()
       } catch (error) {
-        console.error("Error processing location:", error)
-        setGeolocationStatus((prev) => ({
-          ...prev,
-          error: "Error processing your location",
-        }))
-      } finally {
+        console.error("Error processing GPS location:", error)
+        updateLocation("Nyack", "gps-error")
+        setGeolocationStatus("error")
         stopDetecting()
       }
     }
 
     const errorCallback = (error: GeolocationPositionError) => {
-      let errorMessage = "Unable to retrieve your location"
-      let permission: "granted" | "denied" | "prompt" | "unknown" = "unknown"
+      console.log("GPS geolocation error:", error)
+      setGeolocationStatus("denied")
 
+      let errorMessage = "Location access was denied. "
       switch (error.code) {
         case error.PERMISSION_DENIED:
-          errorMessage = "Location access denied. Please enable location services and try again."
-          permission = "denied"
+          errorMessage += "Please enable location access in your browser settings or select your location manually."
           break
         case error.POSITION_UNAVAILABLE:
-          errorMessage = "Location information is unavailable. Please try again."
+          errorMessage += "Your location is currently unavailable. Please select your location manually."
           break
         case error.TIMEOUT:
-          errorMessage = "Location request timed out. Please try again."
+          errorMessage += "Location request timed out. Please select your location manually."
           break
         default:
-          errorMessage = "An unknown error occurred while retrieving location."
-          break
+          errorMessage += "Please select your location manually."
       }
 
-      setGeolocationStatus((prev) => ({
-        ...prev,
-        permission,
-        error: errorMessage,
-      }))
-
+      alert(errorMessage)
       stopDetecting()
     }
 
-    // Use getCurrentPosition instead of watchPosition to avoid continuous updates
-    navigator.geolocation.getCurrentPosition(successCallback, errorCallback, options)
-  }, [stopDetecting])
+    const options: PositionOptions = {
+      enableHighAccuracy: true, // More accurate for better results
+      timeout: 15000, // 15 second timeout
+      maximumAge: 60000, // 1 minute cache
+    }
+
+    try {
+      // Use getCurrentPosition instead of watchPosition to avoid continuous updates
+      navigator.geolocation.getCurrentPosition(successCallback, errorCallback, options)
+
+      // Fallback timeout to ensure we don't get stuck
+      timeoutRef.current = setTimeout(() => {
+        if (isDetecting.current) {
+          console.log("GPS detection timeout reached, stopping...")
+          setGeolocationStatus("error")
+          stopDetecting()
+        }
+      }, 16000) // Slightly longer than the geolocation timeout
+    } catch (error) {
+      console.error("Error requesting GPS location:", error)
+      setGeolocationStatus("error")
+      stopDetecting()
+    }
+  }, [updateLocation, stopDetecting])
+
+  const handleSetCurrentLocation = useCallback(
+    (location: string) => {
+      updateLocation(location, "manual")
+    },
+    [updateLocation],
+  )
 
   // Cleanup on unmount
   useEffect(() => {
@@ -182,20 +250,11 @@ export function useLocationDetection() {
     }
   }, [stopDetecting])
 
-  // Auto-detect location on mount (optional)
-  const autoDetectLocation = useCallback(() => {
-    if (geolocationStatus.supported && geolocationStatus.permission === "granted") {
-      requestGPSLocation()
-    }
-  }, [geolocationStatus.supported, geolocationStatus.permission, requestGPSLocation])
-
   return {
     currentLocation,
-    setCurrentLocation,
     isDetectingLocation,
     geolocationStatus,
     requestGPSLocation,
-    autoDetectLocation,
-    stopDetecting,
+    setCurrentLocation: handleSetCurrentLocation,
   }
 }
