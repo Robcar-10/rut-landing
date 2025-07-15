@@ -30,6 +30,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const serviceInfo = getServiceBySlug(params.service)
+  const baseUrl = "https://nyackscreenprinting.com"
 
   if (!serviceInfo) {
     return {
@@ -45,10 +46,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     openGraph: {
       title: serviceInfo.metaTitle,
       description: serviceInfo.metaDescription,
-      url: `https://nyackscreenprinting.com/services/${params.service}`,
+      url: `${baseUrl}/services/${params.service}`,
+      siteName: "Nyack Screen Printing",
+      locale: "en_US",
+      type: "website",
       images: [
         {
-          url: `/images/og-${params.service}.jpg`,
+          url: `${baseUrl}/images/og-${params.service}.jpg`,
           width: 1200,
           height: 630,
           alt: `${serviceInfo.title} - Nyack Screen Printing`,
@@ -56,11 +60,26 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       ],
     },
     twitter: {
+      card: "summary_large_image",
       title: serviceInfo.metaTitle,
       description: serviceInfo.metaDescription,
+      images: [`${baseUrl}/images/twitter-${params.service}.jpg`],
     },
     alternates: {
-      canonical: `/services/${params.service}`,
+      canonical: `${baseUrl}/services/${params.service}`,
+    },
+    robots: {
+      index: true,
+      follow: true,
+      nocache: false,
+      googleBot: {
+        index: true,
+        follow: true,
+        noimageindex: false,
+        "max-video-preview": -1,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+      },
     },
   }
 }

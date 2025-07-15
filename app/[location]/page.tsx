@@ -13,7 +13,7 @@ export default function LocationPage({ params }: PageProps) {
 
 // Generate static pages for each location
 export async function generateStaticParams() {
-  const locations = [
+  const locationSlugs = [
     // Rockland County
     "ramapo",
     "clarkstown",
@@ -45,16 +45,17 @@ export async function generateStaticParams() {
     "northvale",
   ]
 
-  return locations.map((location) => ({
+  return locationSlugs.map((location) => ({
     location: location,
   }))
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const location = params.location.replace("-", " ").replace(/\b\w/g, (l) => l.toUpperCase())
+  const location = params.location.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())
+  const baseUrl = "https://nyackscreenprinting.com"
 
   return {
-    title: `${location} Screen Printing & Embroidery | Custom Apparel | Rolled Up Tees`,
+    title: `${location} Screen Printing & Embroidery | Custom Apparel | Nyack Screen Printing`,
     description: `Professional screen printing and embroidery services in ${location}, NY/NJ. Custom t-shirts, hoodies, uniforms, and promotional items. Fast turnaround, premium quality. Serving ${location} businesses since 2020.`,
     keywords: [
       `screen printing ${location}`,
@@ -69,24 +70,42 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       `custom decals ${location}`,
     ],
     openGraph: {
-      title: `${location} Screen Printing & Embroidery | Rolled Up Tees`,
+      title: `${location} Screen Printing & Embroidery | Nyack Screen Printing`,
       description: `Professional screen printing and embroidery services in ${location}. Custom apparel, uniforms, and promotional items.`,
-      url: `https://rolleduptees.com/${params.location}`,
+      url: `${baseUrl}/${params.location}`,
+      siteName: "Nyack Screen Printing",
+      locale: "en_US",
+      type: "website",
       images: [
         {
-          url: `/images/og-${params.location}.jpg`,
+          url: `${baseUrl}/images/og-${params.location}.jpg`,
           width: 1200,
           height: 630,
-          alt: `Screen Printing Services in ${location} - Rolled Up Tees`,
+          alt: `Screen Printing Services in ${location} - Nyack Screen Printing`,
         },
       ],
     },
     twitter: {
-      title: `${location} Screen Printing & Embroidery | Rolled Up Tees`,
+      card: "summary_large_image",
+      title: `${location} Screen Printing & Embroidery | Nyack Screen Printing`,
       description: `Professional screen printing and embroidery services in ${location}. Custom apparel and promotional items.`,
+      images: [`${baseUrl}/images/twitter-${params.location}.jpg`],
     },
     alternates: {
-      canonical: `/${params.location}`,
+      canonical: `${baseUrl}/${params.location}`,
+    },
+    robots: {
+      index: true,
+      follow: true,
+      nocache: false,
+      googleBot: {
+        index: true,
+        follow: true,
+        noimageindex: false,
+        "max-video-preview": -1,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+      },
     },
   }
 }

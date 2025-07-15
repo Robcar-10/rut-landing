@@ -6,10 +6,13 @@ import { getCSPHeader } from "@/lib/security"
 
 const inter = Inter({ subsets: ["latin"] })
 
+const baseUrl = "https://nyackscreenprinting.com"
+
 export const metadata: Metadata = {
+  metadataBase: new URL(baseUrl),
   title: {
-    default: "Rolled Up Tees - Custom Screen Printing & Embroidery in Nyack, NY",
-    template: "%s | Rolled Up Tees - Custom Screen Printing & Embroidery",
+    default: "Nyack Screen Printing - Custom Screen Printing & Embroidery in Nyack, NY",
+    template: "%s | Nyack Screen Printing",
   },
   description:
     "Professional screen printing and embroidery services in Nyack, NY and surrounding areas. Custom t-shirts, hoodies, uniforms, and promotional items. Fast turnaround, premium quality, local business since 2020.",
@@ -29,41 +32,40 @@ export const metadata: Metadata = {
     "corporate apparel",
     "event shirts",
   ],
-  authors: [{ name: "Rolled Up Tees", url: "https://rolleduptees.com" }],
-  creator: "Rolled Up Tees",
-  publisher: "Rolled Up Tees",
+  authors: [{ name: "Nyack Screen Printing", url: baseUrl }],
+  creator: "Nyack Screen Printing",
+  publisher: "Nyack Screen Printing",
   formatDetection: {
     email: false,
     address: false,
     telephone: false,
   },
-  metadataBase: new URL("https://rolleduptees.com"),
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "Rolled Up Tees - Custom Screen Printing & Embroidery in Nyack, NY",
+    title: "Nyack Screen Printing - Custom Screen Printing & Embroidery in Nyack, NY",
     description:
       "Professional screen printing and embroidery services in Nyack, NY and surrounding areas. Custom t-shirts, hoodies, uniforms, and promotional items.",
-    url: "https://rolleduptees.com",
-    siteName: "Rolled Up Tees",
+    url: baseUrl,
+    siteName: "Nyack Screen Printing",
     locale: "en_US",
     type: "website",
     images: [
       {
-        url: "/images/og-image.jpg",
+        url: `${baseUrl}/images/og-image.jpg`,
         width: 1200,
         height: 630,
-        alt: "Rolled Up Tees - Custom Screen Printing & Embroidery Services",
+        alt: "Nyack Screen Printing - Custom Screen Printing & Embroidery Services",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Rolled Up Tees - Custom Screen Printing & Embroidery",
+    title: "Nyack Screen Printing - Custom Screen Printing & Embroidery",
     description: "Professional screen printing and embroidery services in Nyack, NY and surrounding areas.",
-    images: ["/images/twitter-image.jpg"],
-    creator: "@rolleduptees",
+    images: [`${baseUrl}/images/twitter-image.jpg`],
+    creator: "@nyackscreenprinting",
   },
   robots: {
     index: true,
@@ -94,13 +96,14 @@ export const metadata: Metadata = {
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "LocalBusiness",
-  "@id": "https://rolleduptees.com",
-  name: "Rolled Up Tees",
-  image: "https://rolleduptees.com/images/logo.jpg",
+  "@id": baseUrl,
+  name: "Nyack Screen Printing",
+  alternateName: "Rolled Up Tees",
+  image: `${baseUrl}/images/logo.jpg`,
   description: "Professional screen printing and embroidery services in Nyack, NY and surrounding areas.",
-  url: "https://rolleduptees.com",
+  url: baseUrl,
   telephone: "+1-845-358-2037",
-  email: "info@rolleduptees.com",
+  email: "info@nyackscreenprinting.com",
   address: {
     "@type": "PostalAddress",
     streetAddress: "298 Route 59",
@@ -236,9 +239,6 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" href="/icon.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-        {/* Canonical URL */}
-        <link rel="canonical" href="https://rolleduptees.com" />
       </head>
       <body className={inter.className}>{children}</body>
     </html>

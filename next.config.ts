@@ -1,6 +1,5 @@
-import type { NextConfig } from "next"
-
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -34,6 +33,67 @@ const nextConfig: NextConfig = {
     }
     return config
   },
+
+  // Redirects to handle old URLs and ensure canonical structure
+  async redirects() {
+    return [
+      // Redirect old domain if needed
+      {
+        source: "/rolleduptees.com/:path*",
+        destination: "https://nyackscreenprinting.com/:path*",
+        permanent: true,
+      },
+      // Redirect www to non-www
+      {
+        source: "/:path*",
+        has: [
+          {
+            type: "host",
+            value: "www.nyackscreenprinting.com",
+          },
+        ],
+        destination: "https://nyackscreenprinting.com/:path*",
+        permanent: true,
+      },
+      // Redirect trailing slashes
+      {
+        source: "/:path*/",
+        destination: "/:path*",
+        permanent: true,
+      },
+    ]
+  },
+
+  // Headers for SEO and security
+  async headers() {
+    return [
+      {
+        source: "/(.*)",
+        headers: [
+          {
+            key: "X-DNS-Prefetch-Control",
+            value: "on",
+          },
+          {
+            key: "Strict-Transport-Security",
+            value: "max-age=31536000; includeSubDomains",
+          },
+          {
+            key: "X-Frame-Options",
+            value: "DENY",
+          },
+          {
+            key: "X-Content-Type-Options",
+            value: "nosniff",
+          },
+          {
+            key: "Referrer-Policy",
+            value: "strict-origin-when-cross-origin",
+          },
+        ],
+      },
+    ]
+  },
 }
 
-export default nextConfig
+module.exports = nextConfig
