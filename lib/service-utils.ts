@@ -14,7 +14,7 @@ export interface ServiceInfo {
 }
 
 export const services: ServiceInfo[] = [
-  // Core Services
+  // Core Services - Updated with better "near me" targeting
   {
     slug: "screen-printing-near-me",
     title: "Screen Printing Near Me",
@@ -27,9 +27,99 @@ export const services: ServiceInfo[] = [
       'When you search for "screen printing near me," you want a local partner who understands your needs and delivers exceptional results. Our professional screen printing services combine years of experience with state-of-the-art equipment to create custom apparel that exceeds expectations.',
     features: ["Local pickup & delivery", "Same-day quotes", "Premium inks & materials", "Bulk discounts available"],
     category: "printing",
-    keywords: ["screen printing near me", "local screen printing", "custom t-shirt printing", "apparel printing"],
+    keywords: [
+      "screen printing near me",
+      "local screen printing",
+      "custom t-shirt printing",
+      "apparel printing",
+      "t-shirt printing near me",
+      "shirt printing near me",
+      "custom t shirts near me",
+      "t shirt printing",
+      "shirt companies near me",
+    ],
     relatedServices: ["custom-embroidery", "fast-turnaround", "bulk-printing"],
   },
+
+  // NEW: Custom T-Shirts Near Me - High priority service
+  {
+    slug: "custom-t-shirts-near-me",
+    title: "Custom T-Shirts Near Me",
+    metaTitle: "Custom T-Shirts Near Me | Local T-Shirt Design & Printing | Nyack Screen Printing",
+    metaDescription:
+      "Need custom t-shirts near you? Professional local t-shirt design and printing services. Custom designs, fast turnaround, bulk discounts. Serving your area since 2020.",
+    heroTitle: "Custom T-Shirts Made Locally",
+    heroSubtitle: "From design to delivery, we've got you covered",
+    description:
+      'Searching for "custom t-shirts near me"? Look no further! We specialize in creating high-quality custom t-shirts for businesses, events, teams, and individuals. Our local service means faster turnaround, personalized attention, and the ability to see samples before you commit.',
+    features: ["Custom design service", "Local consultation", "Fast local delivery", "Bulk order discounts"],
+    category: "printing",
+    keywords: [
+      "custom t shirts near me",
+      "custom t-shirts near me",
+      "t-shirt design near me",
+      "t shirt design near me",
+      "custom shirt printing",
+      "personalized t-shirts",
+      "local t-shirt printing",
+      "custom tee shirts",
+      "t-shirt making near me",
+      "tshirt making near me",
+    ],
+    relatedServices: ["screen-printing-near-me", "t-shirt-design-service", "bulk-printing"],
+  },
+
+  // NEW: T-Shirt Design Service
+  {
+    slug: "t-shirt-design-service",
+    title: "T-Shirt Design Service",
+    metaTitle: "T-Shirt Design Service | Custom T-Shirt Design Near Me | Nyack Screen Printing",
+    metaDescription:
+      "Professional t-shirt design service near you. Custom t-shirt designs, logo creation, and graphic design for screen printing and embroidery. Free design consultation.",
+    heroTitle: "Professional T-Shirt Design Service",
+    heroSubtitle: "Bring your ideas to life with custom designs",
+    description:
+      "Need help with t-shirt design? Our professional design service takes your ideas and creates stunning custom t-shirt designs ready for printing. From concept to final artwork, we handle every step of the design process.",
+    features: ["Professional designers", "Unlimited revisions", "Print-ready artwork", "Logo design included"],
+    category: "specialty",
+    keywords: [
+      "t-shirt design near me",
+      "t shirt design near me",
+      "custom t-shirt design",
+      "t-shirt graphic design",
+      "logo design for shirts",
+      "shirt design service",
+      "custom shirt design",
+      "t-shirt artwork",
+    ],
+    relatedServices: ["custom-t-shirts-near-me", "screen-printing-near-me", "custom-embroidery"],
+  },
+
+  // NEW: T-Shirt Making Service
+  {
+    slug: "t-shirt-making-service",
+    title: "T-Shirt Making Service",
+    metaTitle: "T-Shirt Making Service Near Me | Custom T-Shirt Production | Nyack Screen Printing",
+    metaDescription:
+      "Complete t-shirt making service near you. From blank shirts to finished custom apparel. Professional t-shirt production with screen printing and embroidery options.",
+    heroTitle: "Complete T-Shirt Making Service",
+    heroSubtitle: "From concept to finished product",
+    description:
+      "Our comprehensive t-shirt making service handles everything from sourcing quality blank shirts to applying your custom designs. Whether you need screen printing, embroidery, or heat transfer, we make the entire process seamless.",
+    features: ["Quality blank shirts", "Multiple decoration methods", "Full-service production", "Quality control"],
+    category: "printing",
+    keywords: [
+      "t-shirt making near me",
+      "tshirt making near me",
+      "custom t-shirt production",
+      "t-shirt manufacturing",
+      "shirt making service",
+      "custom apparel production",
+      "t-shirt creation service",
+    ],
+    relatedServices: ["custom-t-shirts-near-me", "screen-printing-near-me", "bulk-printing"],
+  },
+
   {
     slug: "custom-embroidery",
     title: "Custom Embroidery Services",
