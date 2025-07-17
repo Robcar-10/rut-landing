@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
@@ -58,9 +58,22 @@ export const ContactForm = ({ currentLocation }: ContactFormProps) => {
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error" | "fallback">("idle")
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([])
   const [isDragOver, setIsDragOver] = useState(false)
+  const [isFirstResponderPage, setIsFirstResponderPage] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { hasConsent } = useCookieConsent()
   const honeypot = createClientHoneypot()
+
+  // Check if we're on a first responder page - client-side only
+  useEffect(() => {
+    const path = window.location.pathname.toLowerCase()
+    setIsFirstResponderPage(
+      path.includes("first-responder") ||
+        path.includes("fire-department") ||
+        path.includes("police") ||
+        path.includes("ems") ||
+        path.includes("paramedic"),
+    )
+  }, [])
 
   const handleInputChange = (field: keyof ContactFormData, value: any) => {
     // For most text fields, just do basic sanitization that preserves spaces
@@ -557,11 +570,7 @@ export const ContactForm = ({ currentLocation }: ContactFormProps) => {
             </div>
 
             {/* First Responder Discount - Only show on first responder pages */}
-            {window.location.pathname.includes("first-responder") ||
-            window.location.pathname.includes("fire-department") ||
-            window.location.pathname.includes("police") ||
-            window.location.pathname.includes("ems") ||
-            window.location.pathname.includes("paramedic") ? (
+            {isFirstResponderPage && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-4 mt-4">
                 <div className="flex items-start gap-3">
                   <input
@@ -582,7 +591,7 @@ export const ContactForm = ({ currentLocation }: ContactFormProps) => {
                   </label>
                 </div>
               </div>
-            ) : null}
+            )}
 
             {/* Submit Button */}
             <Button

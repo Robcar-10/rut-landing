@@ -21,10 +21,16 @@ const highValueServices = [
     isHighPriority: true,
   },
   {
-    title: "First Responder Apparel",
-    slug: "first-responder-apparel",
-    description: "Custom first responder apparel for police, fire, EMS, and emergency services.",
+    title: "T-Shirt Design Service",
+    slug: "t-shirt-design-service",
+    description: "Professional t-shirt design from concept to print",
     isHighPriority: true,
+  },
+  {
+    title: "First Responder Apparel",
+    slug: "first-responder-apparel", // This was likely duplicated
+    description: "Premium apparel for police, fire, and EMS departments",
+    isHighPriority: false,
   },
   {
     title: "Custom Embroidery",
@@ -35,13 +41,7 @@ const highValueServices = [
   {
     title: "Rush Orders",
     slug: "rush-orders",
-    description: "48-hour printing services",
-    isHighPriority: false,
-  },
-  {
-    title: "Bulk Printing",
-    slug: "first-responder-apparel",
-    description: "Volume discounts for large orders and events",
+    description: "Same-day and 24-hour emergency printing services",
     isHighPriority: false,
   },
 ]
@@ -58,7 +58,7 @@ export const InternalLinksSection = ({ currentLocation }: InternalLinksSectionPr
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {highValueServices.map((service, index) => (
             <Link
-              key={service.slug}
+              key={`${service.slug}-${index}`} // Added index to ensure uniqueness
               href={`/services/${service.slug}`}
               className="group bg-white p-4 sm:p-5 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 hover:border-purple-200"
             >
