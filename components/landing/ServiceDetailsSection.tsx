@@ -148,6 +148,15 @@ export const ServiceDetailsSection = ({ serviceInfo, currentLocation }: ServiceD
               </div>
             </div>
 
+            {serviceInfo.category === "first-responder" && (
+              <div className="mb-4 bg-red-50 border border-red-200 rounded-lg p-4 text-center">
+                <div className="text-red-600 font-bold mb-1">FIRST RESPONDER SPECIAL</div>
+                <div className="text-gray-700 text-sm">10% OFF your first order + FREE design consultation</div>
+                <div className="text-xs text-gray-500 mt-1">
+                  *Available for Police, Fire, EMS, and other emergency services
+                </div>
+              </div>
+            )}
             <Button
               className="w-full bg-gradient-to-r from-[#FF6452] to-[#B221F6] hover:from-[#E55A49] hover:to-[#A01EE6] text-white font-semibold py-3 px-6 rounded-lg text-lg"
               onClick={() => document.getElementById("contact-form")?.scrollIntoView({ behavior: "smooth" })}

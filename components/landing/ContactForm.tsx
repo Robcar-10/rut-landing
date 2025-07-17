@@ -556,6 +556,34 @@ export const ContactForm = ({ currentLocation }: ContactFormProps) => {
               )}
             </div>
 
+            {/* First Responder Discount - Only show on first responder pages */}
+            {window.location.pathname.includes("first-responder") ||
+            window.location.pathname.includes("fire-department") ||
+            window.location.pathname.includes("police") ||
+            window.location.pathname.includes("ems") ||
+            window.location.pathname.includes("paramedic") ? (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4 mt-4">
+                <div className="flex items-start gap-3">
+                  <input
+                    type="checkbox"
+                    id="first-responder-discount"
+                    className="mt-1"
+                    onChange={(e) => {
+                      // You can add logic here to apply the discount
+                      console.log("First responder discount applied:", e.target.checked)
+                    }}
+                  />
+                  <label htmlFor="first-responder-discount" className="text-sm">
+                    <span className="font-medium text-red-600 block mb-1">Apply First Responder Discount</span>
+                    <span className="text-gray-600">
+                      10% OFF your first order + free design consultation. Available for Police, Fire, EMS, and other
+                      emergency services.
+                    </span>
+                  </label>
+                </div>
+              </div>
+            ) : null}
+
             {/* Submit Button */}
             <Button
               type="submit"

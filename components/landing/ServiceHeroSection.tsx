@@ -84,12 +84,21 @@ export const ServiceHeroSection = ({ serviceInfo, currentLocation }: ServiceHero
           ))}
         </div>
 
-        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
-          <p className="text-gray-800 font-medium text-sm sm:text-base">
-            🎯 <strong>Serving {currentLocation}:</strong> Fast turnaround, local pickup available, and personalized
-            service for your {serviceInfo.title.toLowerCase()} needs.
-          </p>
-        </div>
+        {serviceInfo.category === "first-responder" ? (
+          <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded animate-pulse">
+            <p className="text-gray-800 font-medium text-sm sm:text-base">
+              🚨 <strong>FIRST RESPONDER SPECIAL:</strong> 10% OFF your first order PLUS free t-shirt design and
+              consultation. Thank you for your service to the {currentLocation} community!
+            </p>
+          </div>
+        ) : (
+          <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
+            <p className="text-gray-800 font-medium text-sm sm:text-base">
+              🎯 <strong>Serving {currentLocation}:</strong> Fast turnaround, local pickup available, and personalized
+              service for your {serviceInfo.title.toLowerCase()} needs.
+            </p>
+          </div>
+        )}
       </div>
 
       <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
