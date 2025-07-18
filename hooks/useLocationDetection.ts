@@ -48,6 +48,33 @@ export const useLocationDetection = (initialLocation?: string): UseLocationDetec
     [hasConsent],
   )
 
+  // Check if user has previously set a location preference
+  const getUserLocationPreference = useCallback(() => {
+    if (typeof window === "undefined") return null
+
+    try {
+      return localStorage.getItem("userLocationPreference")
+    } catch (error) {
+      console.log("Could not access localStorage:", error)
+      return null
+    }
+  }, [])
+
+  // Save user location preference
+  const saveUserLocationPreference = useCallback((location: string, source: string) => {
+    if (typeof window === "undefined") return
+
+    try {
+      // Only save if user manually selected or GPS detected (not from shared links)
+      if (source === "manual" || source === "gps" || source === "ip") {
+        localStorage.setItem("userLocationPreference", location)
+        console.log(`Saved user location preference: ${location}`)
+      }
+    } catch (error) {
+      console.log("Could not save to localStorage:", error)
+    }
+  }, [])
+
   // Initialize location detection once
   useEffect(() => {
     if (hasInitialized.current || isDetecting.current) return
@@ -61,19 +88,30 @@ export const useLocationDetection = (initialLocation?: string): UseLocationDetec
       setGeolocationStatus("detecting")
 
       try {
-        // Priority 1: Check URL params or initial location
-        const urlParams = new URLSearchParams(window.location.search)
-        const urlLocation = urlParams.get("location") || initialLocation
+        // Priority 1: Check if user has a saved location preference
+        const savedPreference = getUserLocationPreference()
+        if (savedPreference && isValidServiceLocation(savedPreference)) {
+          console.log("Using saved user preference:", savedPreference)
+          updateLocation(savedPreference, "saved")
+          setGeolocationStatus("success")
+          return
+        }
 
-        if (urlLocation) {
-          const displayLocation = getLocationDisplayName(urlLocation)
-          console.log("Using URL/initial location:", displayLocation)
+        // Priority 2: Only use URL/initial location if it's from a direct navigation (not shared link)
+        // We can detect this by checking if there's a referrer or if it's the first page load
+        const isDirectNavigation =
+          typeof window !== "undefined" &&
+          (document.referrer === "" || document.referrer.includes(window.location.hostname))
+
+        if (initialLocation && isDirectNavigation) {
+          const displayLocation = getLocationDisplayName(initialLocation)
+          console.log("Using initial location (direct navigation):", displayLocation)
           updateLocation(displayLocation, "initial")
           setGeolocationStatus("success")
           return
         }
 
-        // Priority 2: Try IP-based location detection with timeout
+        // Priority 3: Try IP-based location detection with timeout
         const ipDetectionPromise = detectLocationByIP()
         const timeoutPromise = new Promise<string>((_, reject) =>
           setTimeout(() => reject(new Error("IP detection timeout")), 3000),
@@ -85,19 +123,22 @@ export const useLocationDetection = (initialLocation?: string): UseLocationDetec
 
           if (ipLocation && ipLocation !== "Nyack") {
             updateLocation(ipLocation, "ip")
+            saveUserLocationPreference(ipLocation, "ip")
             setGeolocationStatus("ip-detected")
 
-            // Update URL with detected location
-            const newUrl = new URL(window.location.href)
-            newUrl.searchParams.set("location", ipLocation.toLowerCase().replace(" ", "-"))
-            window.history.replaceState({}, "", newUrl.toString())
+            // Update URL with detected location (but don't replace history for shared links)
+            if (typeof window !== "undefined" && isDirectNavigation) {
+              const newUrl = new URL(window.location.href)
+              newUrl.searchParams.set("location", ipLocation.toLowerCase().replace(" ", "-"))
+              window.history.replaceState({}, "", newUrl.toString())
+            }
             return
           }
         } catch (error) {
           console.log("IP detection failed or timed out:", error)
         }
 
-        // Final fallback: Default to Nyack
+        // Final fallback: Always default to Nyack
         console.log("Using default location: Nyack")
         updateLocation("Nyack", "default")
         setGeolocationStatus("idle")
@@ -118,7 +159,7 @@ export const useLocationDetection = (initialLocation?: string): UseLocationDetec
       clearTimeout(timer)
       isDetecting.current = false
     }
-  }, [initialLocation, updateLocation]) // Stable dependencies
+  }, [initialLocation, updateLocation, getUserLocationPreference, saveUserLocationPreference])
 
   const requestGPSLocation = useCallback(() => {
     if (isDetecting.current) return
@@ -146,9 +187,15 @@ export const useLocationDetection = (initialLocation?: string): UseLocationDetec
         if (!isWithinServiceArea(latitude, longitude)) {
           console.log("GPS location is outside service area, defaulting to Nyack")
           updateLocation("Nyack", "gps-outside")
+          saveUserLocationPreference("Nyack", "gps")
           setGeolocationStatus("success")
           setIsDetectingLocation(false)
           isDetecting.current = false
+
+          // Show helpful message
+          alert(
+            "We've set your location to Nyack (our main location) since you're outside our service area. You can change this using the location selector above.",
+          )
           return
         }
 
@@ -156,12 +203,15 @@ export const useLocationDetection = (initialLocation?: string): UseLocationDetec
         console.log(`GPS - Nearest location: ${nearestLocation}`)
 
         updateLocation(nearestLocation, "gps")
+        saveUserLocationPreference(nearestLocation, "gps")
         setGeolocationStatus("success")
 
         // Update URL with detected location
-        const newUrl = new URL(window.location.href)
-        newUrl.searchParams.set("location", nearestLocation.toLowerCase().replace(" ", "-"))
-        window.history.replaceState({}, "", newUrl.toString())
+        if (typeof window !== "undefined") {
+          const newUrl = new URL(window.location.href)
+          newUrl.searchParams.set("location", nearestLocation.toLowerCase().replace(" ", "-"))
+          window.history.replaceState({}, "", newUrl.toString())
+        }
       } catch (error) {
         console.error("Error processing GPS location:", error)
         updateLocation("Nyack", "gps-error")
@@ -176,16 +226,23 @@ export const useLocationDetection = (initialLocation?: string): UseLocationDetec
       console.log("GPS geolocation error:", error)
       setGeolocationStatus("denied")
 
+      // Always fallback to Nyack when geolocation is denied
+      updateLocation("Nyack", "gps-denied")
+      saveUserLocationPreference("Nyack", "manual")
+
       let errorMessage = "Location access was denied. "
       switch (error.code) {
         case error.PERMISSION_DENIED:
-          errorMessage += "Please enable location access in your browser settings or select your location manually."
+          errorMessage +=
+            "We've set your location to Nyack (our main location). You can change this using the location selector above."
           break
         case error.POSITION_UNAVAILABLE:
-          errorMessage += "Your location is currently unavailable. Please select your location manually."
+          errorMessage +=
+            "Your location is currently unavailable. We've set your location to Nyack. You can change this using the location selector above."
           break
         case error.TIMEOUT:
-          errorMessage += "Location request timed out. Please select your location manually."
+          errorMessage +=
+            "Location request timed out. We've set your location to Nyack. You can change this using the location selector above."
           break
       }
 
@@ -202,13 +259,14 @@ export const useLocationDetection = (initialLocation?: string): UseLocationDetec
 
     // Use getCurrentPosition instead of watchPosition to avoid continuous updates
     navigator.geolocation.getCurrentPosition(successCallback, errorCallback, options)
-  }, [updateLocation])
+  }, [updateLocation, saveUserLocationPreference])
 
   const handleSetCurrentLocation = useCallback(
     (location: string) => {
       updateLocation(location, "manual")
+      saveUserLocationPreference(location, "manual")
     },
-    [updateLocation],
+    [updateLocation, saveUserLocationPreference],
   )
 
   return {

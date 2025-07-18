@@ -4,8 +4,8 @@ import type React from "react"
 import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Card, CardContent } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
+import { Card, CardContent } from "@/components/ui/card"
 import { Upload, X, FileText, CheckCircle, AlertCircle, ImageIcon, Phone, Mail } from "lucide-react"
 import { contactFormSchema, type ContactFormData } from "@/lib/form-validation"
 import { trackQuoteRequest, trackFileUpload } from "@/lib/analytics"
@@ -294,6 +294,7 @@ export const ContactForm = ({ currentLocation }: ContactFormProps) => {
           ...formData,
           location: currentLocation,
           uploadedFiles: fileUrls,
+          isFirstResponderDiscount: isFirstResponderPage,
         }),
       })
 

@@ -28,7 +28,7 @@ const highValueServices = [
   },
   {
     title: "First Responder Apparel",
-    slug: "first-responder-apparel", // This was likely duplicated
+    slug: "first-responder-apparel",
     description: "Premium apparel for police, fire, and EMS departments",
     isHighPriority: false,
   },
@@ -58,7 +58,7 @@ export const InternalLinksSection = ({ currentLocation }: InternalLinksSectionPr
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {highValueServices.map((service, index) => (
             <Link
-              key={`${service.slug}-${index}`} // Added index to ensure uniqueness
+              key={`${service.slug}-${index}`}
               href={`/services/${service.slug}`}
               className="group bg-white p-4 sm:p-5 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 hover:border-purple-200"
             >
