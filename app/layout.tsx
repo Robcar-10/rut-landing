@@ -40,8 +40,9 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
+  // FIXED: Proper canonical URL for homepage
   alternates: {
-    canonical: "/",
+    canonical: baseUrl,
   },
   openGraph: {
     title: "Nyack Screen Printing - Custom Screen Printing & Embroidery in Nyack, NY",

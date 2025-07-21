@@ -39,14 +39,20 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     }
   }
 
+  const canonicalUrl = `${baseUrl}/services/${params.service}`
+
   return {
     title: serviceInfo.metaTitle,
     description: serviceInfo.metaDescription,
     keywords: serviceInfo.keywords,
+    // FIXED: Proper canonical URL structure
+    alternates: {
+      canonical: canonicalUrl,
+    },
     openGraph: {
       title: serviceInfo.metaTitle,
       description: serviceInfo.metaDescription,
-      url: `${baseUrl}/services/${params.service}`,
+      url: canonicalUrl,
       siteName: "Nyack Screen Printing",
       locale: "en_US",
       type: "website",
@@ -64,9 +70,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title: serviceInfo.metaTitle,
       description: serviceInfo.metaDescription,
       images: [`${baseUrl}/images/twitter-${params.service}.jpg`],
-    },
-    alternates: {
-      canonical: `${baseUrl}/services/${params.service}`,
     },
     robots: {
       index: true,

@@ -34,16 +34,10 @@ const nextConfig = {
     return config
   },
 
-  // Redirects to handle old URLs and ensure canonical structure
+  // SIMPLIFIED REDIRECTS - Only essential ones to avoid redirect chains
   async redirects() {
     return [
-      // Redirect old domain if needed
-      {
-        source: "/rolleduptees.com/:path*",
-        destination: "https://nyackscreenprinting.com/:path*",
-        permanent: true,
-      },
-      // Redirect www to non-www
+      // Only redirect www to non-www (most important for SEO)
       {
         source: "/:path*",
         has: [
@@ -55,10 +49,10 @@ const nextConfig = {
         destination: "https://nyackscreenprinting.com/:path*",
         permanent: true,
       },
-      // Redirect trailing slashes
+      // Remove trailing slashes ONLY if they exist (avoid redirect loops)
       {
-        source: "/:path*/",
-        destination: "/:path*",
+        source: "/:path+/",
+        destination: "/:path+",
         permanent: true,
       },
     ]
