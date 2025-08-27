@@ -1,13 +1,91 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 
+// Tracking parameters to remove
+const TRACKING_PARAMETERS = [
+  "fbclid",
+  "gclid",
+  "utm_source",
+  "utm_medium",
+  "utm_campaign",
+  "utm_term",
+  "utm_content",
+  "ref",
+  "_gl",
+  "mc_cid",
+  "mc_eid",
+]
+
 export function middleware(request: NextRequest) {
-  // Security headers
+  const url = request.nextUrl.clone()
+  const hostname = request.headers.get("host") || ""
+
+  // 1. FIRST PRIORITY: Handle domain redirects
+  if (
+    hostname === "rolleduptees.com" ||
+    hostname === "www.rolleduptees.com" ||
+    hostname === "www.nyackscreenprinting.com"
+  ) {
+    url.hostname = "nyackscreenprinting.com"
+    url.protocol = "https:"
+    url.port = ""
+
+    console.log("Middleware: Domain redirect", {
+      from: `${request.nextUrl.protocol}//${hostname}${request.nextUrl.pathname}`,
+      to: url.href,
+    })
+
+    return NextResponse.redirect(url, 301)
+  }
+
+  // 2. SECOND PRIORITY: Force HTTPS (if not already)
+  if (url.protocol === "http:" && !hostname.includes("localhost")) {
+    url.protocol = "https:"
+
+    console.log("Middleware: HTTPS redirect", {
+      from: request.nextUrl.href,
+      to: url.href,
+    })
+
+    return NextResponse.redirect(url, 301)
+  }
+
+  // 3. THIRD PRIORITY: Remove tracking parameters
+  const hasTrackingParams = TRACKING_PARAMETERS.some((param) => url.searchParams.has(param))
+
+  if (hasTrackingParams) {
+    // Remove tracking parameters
+    TRACKING_PARAMETERS.forEach((param) => {
+      url.searchParams.delete(param)
+    })
+
+    console.log("Middleware: Tracking parameter redirect", {
+      from: request.nextUrl.href,
+      to: url.href,
+    })
+
+    // 301 redirect to clean URL
+    return NextResponse.redirect(url, 301)
+  }
+
+  // 4. FOURTH PRIORITY: Remove trailing slashes (except root)
+  if (url.pathname !== "/" && url.pathname.endsWith("/")) {
+    url.pathname = url.pathname.slice(0, -1)
+
+    console.log("Middleware: Trailing slash redirect", {
+      from: request.nextUrl.href,
+      to: url.href,
+    })
+
+    return NextResponse.redirect(url, 301)
+  }
+
+  // Continue with security headers
   const response = NextResponse.next()
 
   // Add security headers
   response.headers.set("X-DNS-Prefetch-Control", "on")
-  response.headers.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
+  response.headers.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload")
   response.headers.set("X-Frame-Options", "DENY")
   response.headers.set("X-Content-Type-Options", "nosniff")
   response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin")

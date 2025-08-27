@@ -34,10 +34,33 @@ const nextConfig = {
     return config
   },
 
-  // SIMPLIFIED REDIRECTS - Only essential ones to avoid redirect chains
+  // FIXED REDIRECTS - Ensure all domains point to nyackscreenprinting.com
   async redirects() {
     return [
-      // Only redirect www to non-www (most important for SEO)
+      // Redirect old domain to new domain (HIGHEST PRIORITY)
+      {
+        source: "/:path*",
+        has: [
+          {
+            type: "host",
+            value: "rolleduptees.com",
+          },
+        ],
+        destination: "https://nyackscreenprinting.com/:path*",
+        permanent: true,
+      },
+      {
+        source: "/:path*",
+        has: [
+          {
+            type: "host",
+            value: "www.rolleduptees.com",
+          },
+        ],
+        destination: "https://nyackscreenprinting.com/:path*",
+        permanent: true,
+      },
+      // Redirect www subdomain to non-www for current domain
       {
         source: "/:path*",
         has: [
@@ -70,7 +93,7 @@ const nextConfig = {
           },
           {
             key: "Strict-Transport-Security",
-            value: "max-age=31536000; includeSubDomains",
+            value: "max-age=31536000; includeSubDomains; preload",
           },
           {
             key: "X-Frame-Options",
