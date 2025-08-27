@@ -33,11 +33,6 @@
       ],
       "destination": "https://nyackscreenprinting.com/$1",
       "permanent": true
-    },
-    {
-      "source": "/:path+/",
-      "destination": "/:path+",
-      "permanent": true
     }
   ],
   "headers": [
@@ -63,10 +58,6 @@
         {
           "key": "Referrer-Policy",
           "value": "strict-origin-when-cross-origin"
-        },
-        {
-          "key": "Permissions-Policy",
-          "value": "camera=(), microphone=(), geolocation=(self)"
         }
       ]
     }

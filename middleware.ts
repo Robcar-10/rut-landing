@@ -17,16 +17,8 @@ const TRACKING_PARAMETERS = [
 ]
 
 export function middleware(request: NextRequest) {
-  const url = request.nextUrl.clone()
-
-  // REMOVED ALL REDIRECTS - These are handled by vercel.json
-  // Only add security headers and continue
-  const response = NextResponse.next()
-
-  // Add minimal security headers (main headers are in vercel.json)
-  response.headers.set("X-Robots-Tag", "index, follow")
-
-  return response
+  // DO NOTHING - Let vercel.json handle all redirects
+  return NextResponse.next()
 }
 
 export const config = {

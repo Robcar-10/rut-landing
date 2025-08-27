@@ -3,6 +3,7 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import { UrlCleaner } from "@/components/UrlCleaner"
+import { CanonicalUrl } from "@/components/CanonicalUrl"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -68,9 +69,6 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
-  verification: {
-    google: "your-google-verification-code",
-  },
 }
 
 export default function RootLayout({
@@ -80,6 +78,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <CanonicalUrl />
+      </head>
       <body className={inter.className}>
         <UrlCleaner />
         {children}
