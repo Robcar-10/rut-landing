@@ -44,389 +44,188 @@ export const contactInfo = [
   },
 ]
 
+// Business Information
+export const BUSINESS_INFO = {
+  name: "Nyack Screen Printing",
+  phone: "(845) 358-2037",
+  email: "info@nyackscreenprinting.com",
+  address: "Nyack, NY 10960",
+  hours: "Mon-Fri: 9AM-6PM, Sat: 10AM-4PM",
+  established: "2020",
+}
+
+// Location Interface
 export interface Location {
   name: string
   slug: string
-  state: string
   county: string
-  description: string
-  coordinates: {
-    lat: number
-    lng: number
-  }
   zipCodes: string[]
-  nearbyTowns: string[]
-}
-
-export interface Service {
-  name: string
-  slug: string
   description: string
-  features: string[]
-  pricing: {
-    min: number
-    max: number
-  }
-  turnaround: string
-  category: string
+  population: string
+  keyFeatures: string[]
+  nearbyAreas: string[]
+  businessTypes: string[]
 }
 
+// Locations Data
 export const LOCATIONS: Location[] = [
-  // Rockland County
-  {
-    name: "Ramapo",
-    slug: "ramapo",
-    state: "NY",
-    county: "Rockland",
-    description: "Professional screen printing and embroidery services in Ramapo, NY",
-    coordinates: { lat: 41.1156, lng: -74.1434 },
-    zipCodes: ["10901", "10952"],
-    nearbyTowns: ["Spring Valley", "Monsey", "Suffern"],
-  },
-  {
-    name: "Clarkstown",
-    slug: "clarkstown",
-    state: "NY",
-    county: "Rockland",
-    description: "Custom apparel printing services in Clarkstown, NY",
-    coordinates: { lat: 41.109, lng: -73.9606 },
-    zipCodes: ["10954", "10956", "10994"],
-    nearbyTowns: ["New City", "Nanuet", "West Nyack"],
-  },
   {
     name: "Orangetown",
     slug: "orangetown",
-    state: "NY",
-    county: "Rockland",
-    description: "Screen printing and embroidery in Orangetown, NY",
-    coordinates: { lat: 41.0459, lng: -73.9526 },
-    zipCodes: ["10962", "10965", "10968"],
-    nearbyTowns: ["Pearl River", "Blauvelt", "Tappan"],
-  },
-  {
-    name: "Haverstraw",
-    slug: "haverstraw",
-    state: "NY",
-    county: "Rockland",
-    description: "Custom t-shirt printing in Haverstraw, NY",
-    coordinates: { lat: 41.1967, lng: -73.9651 },
-    zipCodes: ["10927", "10993"],
-    nearbyTowns: ["West Haverstraw", "Stony Point", "Garnerville"],
-  },
-  {
-    name: "New City",
-    slug: "new-city",
-    state: "NY",
-    county: "Rockland",
-    description: "Professional screen printing services in New City, NY",
-    coordinates: { lat: 41.1478, lng: -73.989 },
-    zipCodes: ["10956"],
-    nearbyTowns: ["Clarkstown", "Congers", "Valley Cottage"],
-  },
-  {
-    name: "Spring Valley",
-    slug: "spring-valley",
-    state: "NY",
-    county: "Rockland",
-    description: "Custom apparel and promotional products in Spring Valley, NY",
-    coordinates: { lat: 41.1126, lng: -74.0437 },
-    zipCodes: ["10977"],
-    nearbyTowns: ["Monsey", "Nanuet", "Chestnut Ridge"],
-  },
-  {
-    name: "Monsey",
-    slug: "monsey",
-    state: "NY",
-    county: "Rockland",
-    description: "Screen printing and embroidery services in Monsey, NY",
-    coordinates: { lat: 41.1084, lng: -74.0687 },
-    zipCodes: ["10952"],
-    nearbyTowns: ["Spring Valley", "Airmont", "Chestnut Ridge"],
-  },
-  {
-    name: "Nanuet",
-    slug: "nanuet",
-    state: "NY",
-    county: "Rockland",
-    description: "Custom t-shirts and promotional items in Nanuet, NY",
-    coordinates: { lat: 41.0887, lng: -74.0134 },
-    zipCodes: ["10954"],
-    nearbyTowns: ["Pearl River", "Spring Valley", "West Nyack"],
+    county: "Rockland County",
+    zipCodes: ["10962", "10965", "10983"],
+    description: "Serving Orangetown with professional screen printing and custom apparel services.",
+    population: "48,000+",
+    keyFeatures: ["Historic Hudson River town", "Business district", "Residential communities"],
+    nearbyAreas: ["Pearl River", "Tappan", "Blauvelt"],
+    businessTypes: ["Local businesses", "Schools", "Sports teams", "Community organizations"],
   },
   {
     name: "Pearl River",
     slug: "pearl-river",
-    state: "NY",
-    county: "Rockland",
-    description: "Professional printing services in Pearl River, NY",
-    coordinates: { lat: 41.059, lng: -74.0215 },
+    county: "Rockland County",
     zipCodes: ["10965"],
-    nearbyTowns: ["Nanuet", "Montvale", "Park Ridge"],
-  },
-  {
-    name: "Stony Point",
-    slug: "stony-point",
-    state: "NY",
-    county: "Rockland",
-    description: "Custom screen printing in Stony Point, NY",
-    coordinates: { lat: 41.2367, lng: -73.9873 },
-    zipCodes: ["10980"],
-    nearbyTowns: ["Haverstraw", "Tomkins Cove", "Bear Mountain"],
-  },
-  {
-    name: "West Haverstraw",
-    slug: "west-haverstraw",
-    state: "NY",
-    county: "Rockland",
-    description: "Screen printing services in West Haverstraw, NY",
-    coordinates: { lat: 41.209, lng: -73.9834 },
-    zipCodes: ["10993"],
-    nearbyTowns: ["Haverstraw", "Stony Point", "Garnerville"],
-  },
-  {
-    name: "Valley Cottage",
-    slug: "valley-cottage",
-    state: "NY",
-    county: "Rockland",
-    description: "Custom apparel printing in Valley Cottage, NY",
-    coordinates: { lat: 41.1156, lng: -73.9429 },
-    zipCodes: ["10989"],
-    nearbyTowns: ["Upper Nyack", "Nyack", "Congers"],
-  },
-  {
-    name: "Congers",
-    slug: "congers",
-    state: "NY",
-    county: "Rockland",
-    description: "Professional screen printing in Congers, NY",
-    coordinates: { lat: 41.1456, lng: -73.9445 },
-    zipCodes: ["10920"],
-    nearbyTowns: ["Valley Cottage", "New City", "Lake DeForest"],
-  },
-  {
-    name: "Blauvelt",
-    slug: "blauvelt",
-    state: "NY",
-    county: "Rockland",
-    description: "Custom t-shirt printing in Blauvelt, NY",
-    coordinates: { lat: 41.0634, lng: -73.9565 },
-    zipCodes: ["10913"],
-    nearbyTowns: ["Orangeburg", "Tappan", "Pearl River"],
-  },
-  {
-    name: "West Nyack",
-    slug: "west-nyack",
-    state: "NY",
-    county: "Rockland",
-    description: "Screen printing and embroidery in West Nyack, NY",
-    coordinates: { lat: 41.0967, lng: -73.9723 },
-    zipCodes: ["10994"],
-    nearbyTowns: ["Central Nyack", "Nanuet", "Blauvelt"],
-  },
-  {
-    name: "Piermont",
-    slug: "piermont",
-    state: "NY",
-    county: "Rockland",
-    description: "Custom printing services in Piermont, NY",
-    coordinates: { lat: 41.0401, lng: -73.9179 },
-    zipCodes: ["10968"],
-    nearbyTowns: ["Sparkill", "Tappan", "Dobbs Ferry"],
-  },
-  {
-    name: "Upper Nyack",
-    slug: "upper-nyack",
-    state: "NY",
-    county: "Rockland",
-    description: "Professional screen printing in Upper Nyack, NY",
-    coordinates: { lat: 41.1234, lng: -73.9179 },
-    zipCodes: ["10960"],
-    nearbyTowns: ["Nyack", "Valley Cottage", "South Nyack"],
-  },
-  // Westchester County
-  {
-    name: "Ossining",
-    slug: "ossining",
-    state: "NY",
-    county: "Westchester",
-    description: "Custom apparel printing in Ossining, NY",
-    coordinates: { lat: 41.1628, lng: -73.8615 },
-    zipCodes: ["10562"],
-    nearbyTowns: ["Briarcliff Manor", "Croton-on-Hudson", "Sleepy Hollow"],
-  },
-  {
-    name: "Sleepy Hollow",
-    slug: "sleepy-hollow",
-    state: "NY",
-    county: "Westchester",
-    description: "Screen printing services in Sleepy Hollow, NY",
-    coordinates: { lat: 41.0951, lng: -73.8651 },
-    zipCodes: ["10591"],
-    nearbyTowns: ["Tarrytown", "Irvington", "Dobbs Ferry"],
+    description: "Custom screen printing services for Pearl River businesses, schools, and residents.",
+    population: "16,000+",
+    keyFeatures: ["Family-friendly community", "Local businesses", "School district"],
+    nearbyAreas: ["Orangetown", "Nanuet", "Montvale"],
+    businessTypes: ["Retail stores", "Restaurants", "Schools", "Youth sports"],
   },
   {
     name: "Tarrytown",
     slug: "tarrytown",
-    state: "NY",
-    county: "Westchester",
-    description: "Professional printing in Tarrytown, NY",
-    coordinates: { lat: 41.0762, lng: -73.8587 },
+    county: "Westchester County",
     zipCodes: ["10591"],
-    nearbyTowns: ["Sleepy Hollow", "Irvington", "Elmsford"],
+    description: "Professional screen printing and embroidery services for Tarrytown area.",
+    population: "11,000+",
+    keyFeatures: ["Historic village", "Hudson River waterfront", "Business district"],
+    nearbyAreas: ["Sleepy Hollow", "Irvington", "Dobbs Ferry"],
+    businessTypes: ["Corporate offices", "Restaurants", "Tourism", "Healthcare"],
   },
   {
-    name: "Dobbs Ferry",
-    slug: "dobbs-ferry",
-    state: "NY",
-    county: "Westchester",
-    description: "Custom screen printing in Dobbs Ferry, NY",
-    coordinates: { lat: 41.0134, lng: -73.8726 },
-    zipCodes: ["10522"],
-    nearbyTowns: ["Irvington", "Hastings-on-Hudson", "Ardsley"],
+    name: "Valley Cottage",
+    slug: "valley-cottage",
+    county: "Rockland County",
+    zipCodes: ["10989"],
+    description: "Custom apparel and screen printing services for Valley Cottage community.",
+    population: "9,000+",
+    keyFeatures: ["Residential community", "Local shopping", "Family neighborhoods"],
+    nearbyAreas: ["West Nyack", "Upper Nyack", "Congers"],
+    businessTypes: ["Local services", "Retail", "Schools", "Community groups"],
   },
-  {
-    name: "Irvington",
-    slug: "irvington",
-    state: "NY",
-    county: "Westchester",
-    description: "Screen printing and embroidery in Irvington, NY",
-    coordinates: { lat: 41.039, lng: -73.8726 },
-    zipCodes: ["10533"],
-    nearbyTowns: ["Tarrytown", "Dobbs Ferry", "Ardsley"],
-  },
-  // Bergen County, NJ
   {
     name: "Montvale",
     slug: "montvale",
-    state: "NJ",
-    county: "Bergen",
-    description: "Professional screen printing in Montvale, NJ",
-    coordinates: { lat: 41.0451, lng: -74.0365 },
+    county: "Bergen County",
     zipCodes: ["07645"],
-    nearbyTowns: ["Park Ridge", "Woodcliff Lake", "Pearl River"],
+    description: "Serving Montvale, NJ with quality screen printing and custom embroidery.",
+    population: "8,000+",
+    keyFeatures: ["Corporate headquarters", "Upscale community", "Business parks"],
+    nearbyAreas: ["Pearl River", "Park Ridge", "Woodcliff Lake"],
+    businessTypes: ["Corporate offices", "Professional services", "Retail", "Healthcare"],
   },
   {
-    name: "Westwood",
-    slug: "westwood",
-    state: "NJ",
-    county: "Bergen",
-    description: "Custom apparel printing in Westwood, NJ",
-    coordinates: { lat: 40.989, lng: -74.0326 },
-    zipCodes: ["07675"],
-    nearbyTowns: ["Hillsdale", "Park Ridge", "Washington Township"],
+    name: "Nanuet",
+    slug: "nanuet",
+    county: "Rockland County",
+    zipCodes: ["10954"],
+    description: "Professional screen printing services for Nanuet businesses and organizations.",
+    population: "17,000+",
+    keyFeatures: ["Shopping centers", "Business district", "Residential areas"],
+    nearbyAreas: ["Pearl River", "West Nyack", "Spring Valley"],
+    businessTypes: ["Retail stores", "Restaurants", "Professional services", "Schools"],
   },
   {
-    name: "Hillsdale",
-    slug: "hillsdale",
-    state: "NJ",
-    county: "Bergen",
-    description: "Screen printing services in Hillsdale, NJ",
-    coordinates: { lat: 41.0023, lng: -74.0365 },
-    zipCodes: ["07642"],
-    nearbyTowns: ["Westwood", "Woodcliff Lake", "Park Ridge"],
-  },
-  {
-    name: "Northvale",
-    slug: "northvale",
-    state: "NJ",
-    county: "Bergen",
-    description: "Custom printing in Northvale, NJ",
-    coordinates: { lat: 41.0156, lng: -73.949 },
-    zipCodes: ["07647"],
-    nearbyTowns: ["Norwood", "Rockleigh", "Closter"],
+    name: "New City",
+    slug: "new-city",
+    county: "Rockland County",
+    zipCodes: ["10956"],
+    description: "Custom screen printing and apparel services for New City area.",
+    population: "34,000+",
+    keyFeatures: ["County seat", "Government offices", "Shopping areas"],
+    nearbyAreas: ["Congers", "Valley Cottage", "West Nyack"],
+    businessTypes: ["Government offices", "Professional services", "Retail", "Healthcare"],
   },
 ]
 
+// Service Interface
+export interface Service {
+  name: string
+  slug: string
+  description: string
+  category: "printing" | "embroidery" | "specialty" | "events" | "business" | "first-responder"
+  features: string[]
+  keywords: string[]
+  pricing: string
+  turnaround: string
+}
+
+// Services Data
 export const SERVICES: Service[] = [
   {
     name: "Screen Printing",
     slug: "screen-printing",
-    description: "High-quality screen printing for t-shirts, hoodies, and apparel",
-    features: [
-      "Custom designs and logos",
-      "Multiple color options",
-      "Bulk order discounts",
-      "Fast turnaround times",
-      "Durable, long-lasting prints",
-    ],
-    pricing: { min: 5, max: 50 },
-    turnaround: "3-5 business days",
+    description:
+      "High-quality screen printing for t-shirts, hoodies, and custom apparel with vibrant, long-lasting results.",
     category: "printing",
+    features: ["Vibrant, long-lasting colors", "Bulk order discounts", "Professional setup", "Multiple color options"],
+    keywords: ["screen printing", "t-shirt printing", "custom shirts", "bulk printing", "apparel printing"],
+    pricing: "Starting at $8 per shirt",
+    turnaround: "3-5 business days",
   },
   {
     name: "Custom Embroidery",
     slug: "custom-embroidery",
-    description: "Professional embroidery services for uniforms, hats, and corporate apparel",
-    features: [
-      "Custom logo embroidery",
-      "Thread color matching",
-      "Uniform and corporate apparel",
-      "Hats and caps",
-      "Professional finish",
-    ],
-    pricing: { min: 8, max: 25 },
-    turnaround: "5-7 business days",
+    description: "Professional embroidery services for logos, uniforms, hats, and premium branded apparel.",
     category: "embroidery",
+    features: ["Premium thread quality", "Logo digitization included", "Uniform services", "Hat embroidery specialist"],
+    keywords: ["custom embroidery", "logo embroidery", "uniform embroidery", "hat embroidery", "branded apparel"],
+    pricing: "Starting at $12 per item",
+    turnaround: "5-7 business days",
   },
   {
     name: "Digital Printing",
     slug: "digital-printing",
-    description: "Modern digital printing for detailed designs and small quantities",
-    features: [
-      "Photo-quality prints",
-      "Small quantity orders",
-      "Full-color designs",
-      "Quick turnaround",
-      "No setup fees",
-    ],
-    pricing: { min: 10, max: 35 },
-    turnaround: "2-3 business days",
+    description: "Modern digital printing for detailed designs and small quantities with photo-quality results.",
     category: "printing",
+    features: ["Photo-quality prints", "Small quantity orders", "Full-color designs", "Quick turnaround"],
+    keywords: ["digital printing", "photo printing", "small batch", "full color printing", "detailed designs"],
+    pricing: "Starting at $12 per item",
+    turnaround: "2-3 business days",
   },
   {
     name: "Merch Stores",
     slug: "merch-stores",
-    description: "Custom online merchandise stores for businesses and organizations",
-    features: [
-      "Online store setup",
-      "Inventory management",
-      "Custom branding",
-      "Order fulfillment",
-      "Drop shipping available",
-    ],
-    pricing: { min: 0, max: 0 },
+    description: "Custom online merchandise stores for businesses and organizations with easy ordering systems.",
+    category: "business",
+    features: ["Online store setup", "Inventory management", "Custom branding", "Order fulfillment"],
+    keywords: ["merch stores", "online merchandise", "custom stores", "business merchandise", "branded products"],
+    pricing: "Contact for pricing",
     turnaround: "Setup in 7-10 days",
-    category: "services",
   },
 ]
 
-// Business information
-export const BUSINESS_INFO = {
-  name: "Nyack Screen Printing",
-  alternateName: "Rolled Up Tees",
-  phone: "(845) 358-2037",
-  email: "info@nyackscreenprinting.com",
-  address: {
-    street: "298 Route 59",
-    city: "Nyack",
-    state: "NY",
-    zip: "10960",
-    county: "Rockland",
+// Social Media Links
+export const socialLinks = [
+  {
+    name: "Instagram",
+    url: "https://www.instagram.com/rolleduptees",
+    icon: "instagram",
   },
-  coordinates: {
-    lat: 41.0909,
-    lng: -73.9176,
+  {
+    name: "Facebook",
+    url: "https://www.facebook.com/rolleduptees",
+    icon: "facebook",
   },
-  hours: {
-    monday: "9:00 AM - 5:00 PM",
-    tuesday: "9:00 AM - 5:00 PM",
-    wednesday: "9:00 AM - 5:00 PM",
-    thursday: "9:00 AM - 5:00 PM",
-    friday: "9:00 AM - 5:00 PM",
-    saturday: "10:00 AM - 3:00 PM",
-    sunday: "Closed",
-  },
-  serviceRadius: 15, // miles
-  established: 2020,
-  website: "https://nyackscreenprinting.com",
-}
+]
+
+// Business Hours
+export const businessHours = [
+  { day: "Monday", hours: "9:00 AM - 6:00 PM" },
+  { day: "Tuesday", hours: "9:00 AM - 6:00 PM" },
+  { day: "Wednesday", hours: "9:00 AM - 6:00 PM" },
+  { day: "Thursday", hours: "9:00 AM - 6:00 PM" },
+  { day: "Friday", hours: "9:00 AM - 6:00 PM" },
+  { day: "Saturday", hours: "10:00 AM - 4:00 PM" },
+  { day: "Sunday", hours: "Closed" },
+]

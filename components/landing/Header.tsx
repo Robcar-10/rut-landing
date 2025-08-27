@@ -2,11 +2,10 @@
 
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Printer, Phone } from "lucide-react"
+import { Phone } from "lucide-react"
 import { mainNavLinks } from "@/lib/constants"
 import { MobileNav } from "./MobileNav"
 import Image from "next/image"
-
 
 interface HeaderProps {
   currentLocation: string
@@ -18,7 +17,6 @@ export const Header = ({ currentLocation }: HeaderProps) => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between py-4">
           {/* Logo */}
-          {/* Logo */}
           <Link href="/" className="flex items-center">
             <Image
               src="/images/rolled-up-tees-logo.svg"
@@ -29,18 +27,22 @@ export const Header = ({ currentLocation }: HeaderProps) => {
               priority
             />
           </Link>
+
           {/* Desktop Navigation */}
           <nav className="hidden md:flex space-x-6 lg:space-x-8">
-            {mainNavLinks.map((link) => (
-              <Link
-                key={link.route}
-                href={link.route}
-                className="flex items-center text-gray-700 hover:text-[#B221F6] font-medium gap-1 px-3 py-2 text-sm lg:text-base"
-              >
-                <link.icon className="w-4 h-4 lg:w-5 lg:h-5" />
-                <span>{link.title}</span>
-              </Link>
-            ))}
+            {mainNavLinks.map((link) => {
+              const IconComponent = link.icon
+              return (
+                <Link
+                  key={link.route}
+                  href={link.route}
+                  className="flex items-center text-gray-700 hover:text-[#B221F6] font-medium gap-1 px-3 py-2 text-sm lg:text-base"
+                >
+                  <IconComponent className="w-4 h-4 lg:w-5 lg:h-5" />
+                  <span>{link.title}</span>
+                </Link>
+              )
+            })}
           </nav>
 
           {/* Desktop Action Button */}

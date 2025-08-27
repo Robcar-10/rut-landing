@@ -17,7 +17,7 @@ const nextConfig = {
         hostname: "res.cloudinary.com",
       },
     ],
-    domains: ["blob.v0.dev"],
+    domains: ["blob.v0.dev", "images.unsplash.com", "plus.unsplash.com"], // Keeping the original domains for now
     dangerouslyAllowSVG: true,
     contentDispositionType: "attachment",
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",

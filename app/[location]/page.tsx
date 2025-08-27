@@ -1,9 +1,7 @@
-import type { Metadata } from "next"
 import { notFound } from "next/navigation"
+import type { Metadata } from "next"
 import { LOCATIONS } from "@/lib/constants"
 import LocationLanding from "@/components/location-landing"
-import { CanonicalUrl } from "@/components/CanonicalUrl"
-import { UrlCleaner } from "@/components/UrlCleaner"
 
 interface LocationPageProps {
   params: {
@@ -26,25 +24,9 @@ export async function generateMetadata({ params }: LocationPageProps): Promise<M
     }
   }
 
-  const title = `Screen Printing & Embroidery in ${location.name}, ${location.state} | Nyack Screen Printing`
-  const description = `Professional screen printing, embroidery, and custom apparel services in ${location.name}, ${location.state}. Fast turnaround, competitive prices. Call (845) 358-2037 for a quote.`
-
   return {
-    title,
-    description,
-    openGraph: {
-      title,
-      description,
-      url: `https://nyackscreenprinting.com/${location.slug}`,
-      siteName: "Nyack Screen Printing",
-      locale: "en_US",
-      type: "website",
-    },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
-    },
+    title: `Screen Printing in ${location.name}, ${location.county} | Nyack Screen Printing`,
+    description: `Professional screen printing and custom apparel services in ${location.name}, ${location.county}. Fast turnaround, competitive prices, and quality results.`,
     alternates: {
       canonical: `https://nyackscreenprinting.com/${location.slug}`,
     },
@@ -58,11 +40,5 @@ export default function LocationPage({ params }: LocationPageProps) {
     notFound()
   }
 
-  return (
-    <>
-      <CanonicalUrl url={`https://nyackscreenprinting.com/${location.slug}`} />
-      <UrlCleaner />
-      <LocationLanding location={location} />
-    </>
-  )
+  return <LocationLanding location={location} />
 }

@@ -1,12 +1,11 @@
 "use client"
 
 import { useEffect } from "react"
+import { usePathname } from "next/navigation"
 
-interface CanonicalUrlProps {
-  url: string
-}
+export function CanonicalUrl() {
+  const pathname = usePathname()
 
-export function CanonicalUrl({ url }: CanonicalUrlProps) {
   useEffect(() => {
     // Remove any existing canonical link
     const existingCanonical = document.querySelector('link[rel="canonical"]')
@@ -15,19 +14,19 @@ export function CanonicalUrl({ url }: CanonicalUrlProps) {
     }
 
     // Add new canonical link
-    const link = document.createElement("link")
-    link.rel = "canonical"
-    link.href = url
-    document.head.appendChild(link)
+    const canonical = document.createElement("link")
+    canonical.rel = "canonical"
+    canonical.href = `https://nyackscreenprinting.com${pathname}`
+    document.head.appendChild(canonical)
 
     return () => {
       // Cleanup on unmount
-      const canonicalLink = document.querySelector('link[rel="canonical"]')
-      if (canonicalLink) {
-        canonicalLink.remove()
+      const canonicalToRemove = document.querySelector('link[rel="canonical"]')
+      if (canonicalToRemove) {
+        canonicalToRemove.remove()
       }
     }
-  }, [url])
+  }, [pathname])
 
   return null
 }
