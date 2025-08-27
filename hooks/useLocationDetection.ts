@@ -25,7 +25,7 @@ export const useLocationDetection = (initialLocation?: string): UseLocationDetec
   const [currentLocation, setCurrentLocationState] = useState("Nyack")
   const [isDetectingLocation, setIsDetectingLocation] = useState(false)
   const [geolocationStatus, setGeolocationStatus] = useState<GeolocationStatus>("idle")
-  const { hasConsent } = useCookieConsent()
+  const cookieConsent = useCookieConsent()
   const hasInitialized = useRef(false)
   const isDetecting = useRef(false)
 
@@ -36,8 +36,8 @@ export const useLocationDetection = (initialLocation?: string): UseLocationDetec
         console.log(`Setting location to: ${location} (source: ${source})`)
         setCurrentLocationState(location)
 
-        // Track location change if consent given
-        if (hasConsent("analytics") && source !== "initial") {
+        // Track location change if consent given and analytics accepted
+        if (cookieConsent.preferences?.analytics && source !== "initial") {
           trackLocationChange(location, source as any)
         }
       } else {
@@ -45,7 +45,7 @@ export const useLocationDetection = (initialLocation?: string): UseLocationDetec
         setCurrentLocationState("Nyack")
       }
     },
-    [hasConsent],
+    [cookieConsent.preferences?.analytics],
   )
 
   // Check if user has previously set a location preference
