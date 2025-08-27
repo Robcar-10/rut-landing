@@ -52,7 +52,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(url, 301)
   }
 
-  // Continue with security headers
+  // Just add security headers and continue
   const response = NextResponse.next()
 
   // Add security headers
@@ -62,6 +62,7 @@ export function middleware(request: NextRequest) {
   response.headers.set("X-Content-Type-Options", "nosniff")
   response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin")
   response.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=(self)")
+  response.headers.set("X-Robots-Tag", "index, follow")
 
   return response
 }

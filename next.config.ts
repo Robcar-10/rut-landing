@@ -34,46 +34,8 @@ const nextConfig = {
     return config
   },
 
-  // SIMPLIFIED REDIRECTS - Only handle domain redirects here
-  async redirects() {
-    return [
-      // Redirect old domain to new domain (HIGHEST PRIORITY)
-      {
-        source: "/:path*",
-        has: [
-          {
-            type: "host",
-            value: "rolleduptees.com",
-          },
-        ],
-        destination: "https://nyackscreenprinting.com/:path*",
-        permanent: true,
-      },
-      {
-        source: "/:path*",
-        has: [
-          {
-            type: "host",
-            value: "www.rolleduptees.com",
-          },
-        ],
-        destination: "https://nyackscreenprinting.com/:path*",
-        permanent: true,
-      },
-      // Redirect www subdomain to non-www for current domain
-      {
-        source: "/:path*",
-        has: [
-          {
-            type: "host",
-            value: "www.nyackscreenprinting.com",
-          },
-        ],
-        destination: "https://nyackscreenprinting.com/:path*",
-        permanent: true,
-      },
-    ]
-  },
+  // REMOVED ALL REDIRECTS - Now handled by vercel.json
+  // This prevents conflicts and loops
 
   // Headers for SEO and security
   async headers() {
