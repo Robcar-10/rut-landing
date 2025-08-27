@@ -1,8 +1,9 @@
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
-import { ServiceLanding } from "@/components/service-landing"
+import ServiceLanding from "@/components/service-landing"
 import { SERVICES } from "@/lib/constants"
 import { CanonicalUrl } from "@/components/CanonicalUrl"
+import { getServiceBySlug } from "@/lib/service-utils"
 
 interface ServicePageProps {
   params: {
@@ -68,16 +69,16 @@ export async function generateMetadata({ params }: ServicePageProps): Promise<Me
 }
 
 export default function ServicePage({ params }: ServicePageProps) {
-  const service = SERVICES.find((svc) => svc.slug === params.service)
+  const serviceInfo = getServiceBySlug(params.service)
 
-  if (!service) {
+  if (!serviceInfo) {
     notFound()
   }
 
   return (
     <>
-      <CanonicalUrl pathname={`/services/${service.slug}`} />
-      <ServiceLanding service={service} />
+      <CanonicalUrl pathname={`/services/${params.service}`} />
+      <ServiceLanding serviceInfo={serviceInfo} />
     </>
   )
 }

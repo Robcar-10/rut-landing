@@ -1,16 +1,18 @@
 "use client"
 
 import { useEffect } from "react"
-import { redirectToCleanUrl } from "@/lib/url-utils"
+import { cleanUrl } from "@/lib/url-utils"
 
-/**
- * Client-side component that cleans tracking parameters from URLs
- * NO domain redirects - those are handled by vercel.json
- */
-export const UrlCleaner = () => {
+export function UrlCleaner() {
   useEffect(() => {
-    // Only clean tracking parameters on client-side
-    redirectToCleanUrl()
+    if (typeof window === "undefined") return
+
+    const currentUrl = window.location.href
+    const cleanedUrl = cleanUrl(currentUrl)
+
+    if (currentUrl !== cleanedUrl) {
+      window.history.replaceState({}, "", cleanedUrl)
+    }
   }, [])
 
   return null

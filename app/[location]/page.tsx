@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
-import { LocationLanding } from "@/components/location-landing"
+import LocationLanding from "@/components/location-landing"
 import { LOCATIONS } from "@/lib/constants"
 import { CanonicalUrl } from "@/components/CanonicalUrl"
 
@@ -79,7 +79,7 @@ export default function LocationPage({ params }: LocationPageProps) {
   return (
     <>
       <CanonicalUrl pathname={`/${location.slug}`} />
-      <LocationLanding location={location} />
+      <LocationLanding location={location.slug} />
     </>
   )
 }
