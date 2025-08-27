@@ -1,17 +1,15 @@
 "use client"
 
 import { useLocationDetection } from "@/hooks/useLocationDetection"
-import { useCookieConsent } from "@/hooks/useCookieConsent"
-import { Header } from "./landing/Header"
-import { LocationBanner } from "./landing/LocationBanner"
-import { ServiceHeroSection } from "./landing/ServiceHeroSection"
-import { ContactForm } from "./landing/ContactForm"
-import { ServiceDetailsSection } from "./landing/ServiceDetailsSection"
-import { RelatedServicesSection } from "./landing/RelatedServicesSection"
-import { TestimonialsSection } from "./landing/TestimonialsSection"
-import { Footer } from "./landing/Footer"
-import { StickyMobileElements } from "./landing/StickyMobileElements"
-import { CookieConsent } from "./landing/CookieConsent"
+import { LocationBanner } from "@/components/landing/LocationBanner"
+import { ServiceHeroSection } from "@/components/landing/ServiceHeroSection"
+import { ServiceDetailsSection } from "@/components/landing/ServiceDetailsSection"
+import { RelatedServicesSection } from "@/components/landing/RelatedServicesSection"
+import { TestimonialsSection } from "@/components/landing/TestimonialsSection"
+import { ContactForm } from "@/components/landing/ContactForm"
+import { Footer } from "@/components/landing/Footer"
+import { StickyMobileElements } from "@/components/landing/StickyMobileElements"
+import { CookieConsent } from "@/components/landing/CookieConsent"
 import type { ServiceInfo } from "@/lib/service-utils"
 
 interface ServiceLandingProps {
@@ -22,45 +20,44 @@ export default function ServiceLanding({ serviceInfo }: ServiceLandingProps) {
   const { currentLocation, isDetectingLocation, geolocationStatus, requestGPSLocation, setCurrentLocation } =
     useLocationDetection()
 
-  const { preferences, isLoaded, updatePreferences } = useCookieConsent()
-
   const handleLocationSelect = (selectedLocation: string) => {
     setCurrentLocation(selectedLocation)
-
-    // Update URL with location parameter
-    const newUrl = new URL(window.location.href)
-    newUrl.searchParams.set("location", selectedLocation)
-    window.history.replaceState({}, "", newUrl.toString())
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50">
-      <Header currentLocation={currentLocation} />
-
+    <div className="min-h-screen bg-white">
+      {/* Location Banner */}
       <LocationBanner
         currentLocation={currentLocation}
         isDetectingLocation={isDetectingLocation}
         geolocationStatus={geolocationStatus}
-        onRequestGPSLocation={requestGPSLocation}
+        onRequestLocation={requestGPSLocation}
         onLocationSelect={handleLocationSelect}
       />
 
-      <main className="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
-        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-          <ServiceHeroSection serviceInfo={serviceInfo} currentLocation={currentLocation} />
-          <ContactForm currentLocation={currentLocation} />
-        </div>
+      {/* Service Hero Section */}
+      <ServiceHeroSection serviceInfo={serviceInfo} currentLocation={currentLocation} />
 
-        <ServiceDetailsSection serviceInfo={serviceInfo} currentLocation={currentLocation} />
-        <RelatedServicesSection serviceInfo={serviceInfo} currentLocation={currentLocation} />
-        <TestimonialsSection currentLocation={currentLocation} />
-      </main>
+      {/* Service Details Section */}
+      <ServiceDetailsSection serviceInfo={serviceInfo} currentLocation={currentLocation} />
 
-      <Footer currentLocation={currentLocation} />
-      <StickyMobileElements currentLocation={currentLocation} />
+      {/* Related Services Section */}
+      <RelatedServicesSection currentServiceSlug={serviceInfo.slug} currentLocation={currentLocation} />
+
+      {/* Testimonials Section */}
+      <TestimonialsSection />
+
+      {/* Contact Form */}
+      <ContactForm />
+
+      {/* Footer */}
+      <Footer />
+
+      {/* Sticky Mobile Elements */}
+      <StickyMobileElements />
 
       {/* Cookie Consent */}
-      {isLoaded && !preferences && <CookieConsent onAccept={updatePreferences} />}
+      <CookieConsent />
     </div>
   )
 }
