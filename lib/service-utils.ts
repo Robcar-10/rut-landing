@@ -16,6 +16,21 @@ export interface ServiceInfo {
 export const services: ServiceInfo[] = [
   // Core Services - Updated with better "near me" targeting
   {
+    slug: "screen-printing",
+    title: "Screen Printing Services",
+    metaTitle: "Professional Screen Printing Services | Custom T-Shirts | Nyack Screen Printing",
+    metaDescription:
+      "High-quality screen printing services for custom t-shirts, hoodies, and apparel. Professional results with fast turnaround times.",
+    heroTitle: "Professional Screen Printing Services",
+    heroSubtitle: "Quality printing for all your custom apparel needs",
+    description:
+      "Our professional screen printing services deliver vibrant, long-lasting results for all your custom apparel needs. From single-color designs to complex multi-color prints, we have the expertise and equipment to bring your vision to life.",
+    features: ["Vibrant, long-lasting colors", "Bulk order discounts", "Professional setup", "Multiple color options"],
+    category: "printing",
+    keywords: ["screen printing", "t-shirt printing", "custom shirts", "bulk printing", "apparel printing"],
+    relatedServices: ["custom-embroidery", "digital-printing", "bulk-printing"],
+  },
+  {
     slug: "screen-printing-near-me",
     title: "Screen Printing Near Me",
     metaTitle: "Screen Printing Near Me | Local Custom T-Shirt Printing | Nyack Screen Printing",
@@ -164,6 +179,22 @@ export const services: ServiceInfo[] = [
     category: "printing",
     keywords: ["bulk printing", "volume discounts", "large orders", "wholesale printing"],
     relatedServices: ["corporate-uniforms", "team-t-shirts", "promotional-products"],
+  },
+
+  {
+    slug: "digital-printing",
+    title: "Digital Printing Services",
+    metaTitle: "Digital Printing Services | Photo-Quality Prints | Nyack Screen Printing",
+    metaDescription:
+      "Modern digital printing for detailed designs and small quantities with photo-quality results. Perfect for complex designs and small orders.",
+    heroTitle: "Digital Printing Services",
+    heroSubtitle: "Photo-quality prints for detailed designs",
+    description:
+      "Our digital printing services offer photo-quality results perfect for detailed designs, small quantities, and complex artwork. Using state-of-the-art digital printing technology, we can reproduce intricate designs with stunning clarity and color accuracy.",
+    features: ["Photo-quality prints", "Small quantity orders", "Full-color designs", "Quick turnaround"],
+    category: "printing",
+    keywords: ["digital printing", "photo printing", "small batch", "full color printing", "detailed designs"],
+    relatedServices: ["screen-printing", "custom-embroidery", "promotional-products"],
   },
 
   // Event & Occasion Services
