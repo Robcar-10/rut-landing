@@ -2,34 +2,24 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
-import { UrlCleaner } from "@/components/UrlCleaner"
 import { CanonicalUrl } from "@/components/CanonicalUrl"
+import { UrlCleaner } from "@/components/UrlCleaner"
 
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://nyackscreenprinting.com"),
   title: {
     default: "Nyack Screen Printing | Custom T-Shirts & Embroidery in Rockland County, NY",
     template: "%s | Nyack Screen Printing",
   },
   description:
-    "Professional screen printing and embroidery services in Nyack, NY. Custom t-shirts, hoodies, uniforms, and promotional items. Serving Rockland County, Westchester, and Bergen County NJ.",
-  keywords: [
-    "screen printing Nyack NY",
-    "custom t-shirts Rockland County",
-    "embroidery services NY",
-    "promotional products Nyack",
-    "custom apparel printing",
-    "business uniforms NY",
-    "team jerseys Rockland County",
-    "custom hoodies NY",
-    "local screen printing",
-    "custom decals NY",
-  ],
+    "Professional screen printing, embroidery, and custom apparel services in Nyack, NY. Serving Rockland County with fast turnaround and competitive prices. Call (845) 358-2037.",
+  keywords:
+    "screen printing, embroidery, custom t-shirts, Nyack NY, Rockland County, custom apparel, promotional products",
   authors: [{ name: "Nyack Screen Printing" }],
   creator: "Nyack Screen Printing",
   publisher: "Nyack Screen Printing",
+  metadataBase: new URL("https://nyackscreenprinting.com"),
   alternates: {
     canonical: "https://nyackscreenprinting.com",
   },
@@ -38,36 +28,29 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: "https://nyackscreenprinting.com",
     siteName: "Nyack Screen Printing",
-    title: "Nyack Screen Printing | Custom T-Shirts & Embroidery",
+    title: "Nyack Screen Printing | Custom T-Shirts & Embroidery in Rockland County, NY",
     description:
-      "Professional screen printing and embroidery services in Nyack, NY. Custom t-shirts, hoodies, uniforms, and promotional items.",
-    images: [
-      {
-        url: "/images/custom-screen-printing-nyack.png",
-        width: 1200,
-        height: 630,
-        alt: "Nyack Screen Printing - Custom T-Shirts and Embroidery Services",
-      },
-    ],
+      "Professional screen printing, embroidery, and custom apparel services in Nyack, NY. Serving Rockland County with fast turnaround and competitive prices.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Nyack Screen Printing | Custom T-Shirts & Embroidery",
-    description: "Professional screen printing and embroidery services in Nyack, NY.",
-    images: ["/images/custom-screen-printing-nyack.png"],
+    title: "Nyack Screen Printing | Custom T-Shirts & Embroidery in Rockland County, NY",
+    description:
+      "Professional screen printing, embroidery, and custom apparel services in Nyack, NY. Serving Rockland County with fast turnaround and competitive prices.",
   },
   robots: {
     index: true,
     follow: true,
-    nocache: false,
     googleBot: {
       index: true,
       follow: true,
-      noimageindex: false,
       "max-video-preview": -1,
       "max-image-preview": "large",
       "max-snippet": -1,
     },
+  },
+  verification: {
+    google: "your-google-verification-code",
   },
 }
 
@@ -78,10 +61,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <head>
-        <CanonicalUrl />
-      </head>
       <body className={inter.className}>
+        <CanonicalUrl url="https://nyackscreenprinting.com" />
         <UrlCleaner />
         {children}
       </body>

@@ -3,30 +3,31 @@
 import { useEffect } from "react"
 
 interface CanonicalUrlProps {
-  pathname?: string
+  url: string
 }
 
-export function CanonicalUrl({ pathname }: CanonicalUrlProps) {
+export function CanonicalUrl({ url }: CanonicalUrlProps) {
   useEffect(() => {
-    if (typeof window === "undefined") return
-
-    const currentPath = pathname || window.location.pathname
-    const cleanPath = currentPath === "/" ? "/" : currentPath.replace(/\/$/, "")
-    const canonicalUrl = `https://nyackscreenprinting.com${cleanPath}`
-
-    // Update or create canonical link
-    let canonicalLink = document.querySelector('link[rel="canonical"]') as HTMLLinkElement
-
-    if (!canonicalLink) {
-      canonicalLink = document.createElement("link")
-      canonicalLink.rel = "canonical"
-      document.head.appendChild(canonicalLink)
+    // Remove any existing canonical link
+    const existingCanonical = document.querySelector('link[rel="canonical"]')
+    if (existingCanonical) {
+      existingCanonical.remove()
     }
 
-    if (canonicalLink.href !== canonicalUrl) {
-      canonicalLink.href = canonicalUrl
+    // Add new canonical link
+    const link = document.createElement("link")
+    link.rel = "canonical"
+    link.href = url
+    document.head.appendChild(link)
+
+    return () => {
+      // Cleanup on unmount
+      const canonicalLink = document.querySelector('link[rel="canonical"]')
+      if (canonicalLink) {
+        canonicalLink.remove()
+      }
     }
-  }, [pathname])
+  }, [url])
 
   return null
 }

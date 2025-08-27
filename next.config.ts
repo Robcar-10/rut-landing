@@ -17,12 +17,15 @@ const nextConfig = {
         hostname: "res.cloudinary.com",
       },
     ],
+    domains: ["blob.v0.dev"],
     dangerouslyAllowSVG: true,
     contentDispositionType: "attachment",
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
   serverExternalPackages: ["cloudinary"],
-
+  experimental: {
+    optimizePackageImports: ["lucide-react"],
+  },
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {
@@ -32,9 +35,6 @@ const nextConfig = {
     }
     return config
   },
-
-  // REMOVED ALL REDIRECTS AND HEADERS - Now handled by vercel.json only
-  // This prevents conflicts and loops
 }
 
 module.exports = nextConfig

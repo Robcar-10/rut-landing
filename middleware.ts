@@ -1,23 +1,8 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 
-// Tracking parameters to remove
-const TRACKING_PARAMETERS = [
-  "fbclid",
-  "gclid",
-  "utm_source",
-  "utm_medium",
-  "utm_campaign",
-  "utm_term",
-  "utm_content",
-  "ref",
-  "_gl",
-  "mc_cid",
-  "mc_eid",
-]
-
 export function middleware(request: NextRequest) {
-  // DO NOTHING - Let vercel.json handle all redirects
+  // Let vercel.json handle all redirects
   return NextResponse.next()
 }
 

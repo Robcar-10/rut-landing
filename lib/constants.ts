@@ -1,3 +1,49 @@
+import { Printer, Palette, Monitor, Store, Phone, Mail, MapPin } from "lucide-react"
+
+export const mainNavLinks = [
+  {
+    title: "Screen Printing",
+    route: "/screen-printing",
+    icon: Printer,
+  },
+  {
+    title: "Embroidery",
+    route: "/custom-embroidery",
+    icon: Palette,
+  },
+  {
+    title: "Digital Printing",
+    route: "/digital-printing",
+    icon: Monitor,
+  },
+  {
+    title: "Merch Stores",
+    route: "/merch-stores",
+    icon: Store,
+  },
+]
+
+export const contactInfo = [
+  {
+    icon: Phone,
+    label: "Call us",
+    value: "(845) 358-2037",
+    href: "tel:+18453582037",
+  },
+  {
+    icon: Mail,
+    label: "Email us",
+    value: "info@rolleduptees.com",
+    href: "mailto:info@rolleduptees.com",
+  },
+  {
+    icon: MapPin,
+    label: "Visit us",
+    value: "298 Route 59, Nyack, NY",
+    href: "https://maps.app.goo.gl/BCct95bTHSLTxMyn7",
+  },
+]
+
 export interface Location {
   name: string
   slug: string
@@ -308,8 +354,8 @@ export const SERVICES: Service[] = [
     category: "printing",
   },
   {
-    name: "Embroidery",
-    slug: "embroidery",
+    name: "Custom Embroidery",
+    slug: "custom-embroidery",
     description: "Professional embroidery services for uniforms, hats, and corporate apparel",
     features: [
       "Custom logo embroidery",
@@ -323,28 +369,34 @@ export const SERVICES: Service[] = [
     category: "embroidery",
   },
   {
-    name: "Custom Decals",
-    slug: "custom-decals",
-    description: "Vehicle decals, window graphics, and promotional stickers",
+    name: "Digital Printing",
+    slug: "digital-printing",
+    description: "Modern digital printing for detailed designs and small quantities",
     features: [
-      "Weather-resistant materials",
-      "Custom shapes and sizes",
-      "Vehicle graphics",
-      "Window decals",
-      "Promotional stickers",
+      "Photo-quality prints",
+      "Small quantity orders",
+      "Full-color designs",
+      "Quick turnaround",
+      "No setup fees",
     ],
-    pricing: { min: 2, max: 15 },
+    pricing: { min: 10, max: 35 },
     turnaround: "2-3 business days",
-    category: "graphics",
+    category: "printing",
   },
   {
-    name: "Promotional Products",
-    slug: "promotional-products",
-    description: "Custom promotional items for marketing and events",
-    features: ["Branded merchandise", "Event giveaways", "Corporate gifts", "Trade show items", "Marketing materials"],
-    pricing: { min: 3, max: 30 },
-    turnaround: "7-10 business days",
-    category: "promotional",
+    name: "Merch Stores",
+    slug: "merch-stores",
+    description: "Custom online merchandise stores for businesses and organizations",
+    features: [
+      "Online store setup",
+      "Inventory management",
+      "Custom branding",
+      "Order fulfillment",
+      "Drop shipping available",
+    ],
+    pricing: { min: 0, max: 0 },
+    turnaround: "Setup in 7-10 days",
+    category: "services",
   },
 ]
 

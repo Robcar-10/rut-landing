@@ -1,8 +1,9 @@
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
-import LocationLanding from "@/components/location-landing"
 import { LOCATIONS } from "@/lib/constants"
+import LocationLanding from "@/components/location-landing"
 import { CanonicalUrl } from "@/components/CanonicalUrl"
+import { UrlCleaner } from "@/components/UrlCleaner"
 
 interface LocationPageProps {
   params: {
@@ -25,46 +26,27 @@ export async function generateMetadata({ params }: LocationPageProps): Promise<M
     }
   }
 
-  const baseUrl = "https://nyackscreenprinting.com"
-  const canonicalUrl = `${baseUrl}/${location.slug}`
+  const title = `Screen Printing & Embroidery in ${location.name}, ${location.state} | Nyack Screen Printing`
+  const description = `Professional screen printing, embroidery, and custom apparel services in ${location.name}, ${location.state}. Fast turnaround, competitive prices. Call (845) 358-2037 for a quote.`
 
   return {
-    title: `Screen Printing in ${location.name}, ${location.state} | Custom T-Shirts & Embroidery`,
-    description: `Professional screen printing and embroidery services in ${location.name}, ${location.state}. Custom t-shirts, hoodies, uniforms, and promotional items. Fast turnaround, premium quality.`,
-    keywords: [
-      `screen printing ${location.name}`,
-      `custom t-shirts ${location.name}`,
-      `embroidery ${location.name}`,
-      `promotional products ${location.name}`,
-      `custom apparel ${location.name}`,
-      `business uniforms ${location.name}`,
-      location.name,
-      location.state,
-    ],
-    alternates: {
-      canonical: canonicalUrl,
-    },
+    title,
+    description,
     openGraph: {
-      title: `Screen Printing in ${location.name}, ${location.state} | Nyack Screen Printing`,
-      description: `Professional screen printing and embroidery services in ${location.name}, ${location.state}. Custom t-shirts, hoodies, uniforms, and promotional items.`,
-      url: canonicalUrl,
+      title,
+      description,
+      url: `https://nyackscreenprinting.com/${location.slug}`,
       siteName: "Nyack Screen Printing",
       locale: "en_US",
       type: "website",
-      images: [
-        {
-          url: `${baseUrl}/images/custom-screen-printing-${location.slug}.png`,
-          width: 1200,
-          height: 630,
-          alt: `Screen Printing Services in ${location.name}, ${location.state}`,
-        },
-      ],
     },
     twitter: {
       card: "summary_large_image",
-      title: `Screen Printing in ${location.name}, ${location.state}`,
-      description: `Professional screen printing and embroidery services in ${location.name}, ${location.state}.`,
-      images: [`${baseUrl}/images/custom-screen-printing-${location.slug}.png`],
+      title,
+      description,
+    },
+    alternates: {
+      canonical: `https://nyackscreenprinting.com/${location.slug}`,
     },
   }
 }
@@ -78,8 +60,9 @@ export default function LocationPage({ params }: LocationPageProps) {
 
   return (
     <>
-      <CanonicalUrl pathname={`/${location.slug}`} />
-      <LocationLanding location={location.slug} />
+      <CanonicalUrl url={`https://nyackscreenprinting.com/${location.slug}`} />
+      <UrlCleaner />
+      <LocationLanding location={location} />
     </>
   )
 }

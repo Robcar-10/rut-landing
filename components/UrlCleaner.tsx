@@ -1,40 +1,41 @@
 "use client"
 
 import { useEffect } from "react"
+import { useRouter } from "next/navigation"
 
 export function UrlCleaner() {
-  useEffect(() => {
-    if (typeof window === "undefined") return
+  const router = useRouter()
 
-    const currentUrl = window.location.href
-    const url = new URL(currentUrl)
+  useEffect(() => {
+    const currentUrl = new URL(window.location.href)
+    let needsRedirect = false
+    let newUrl = currentUrl.pathname
+
+    // Remove trailing slash (except for root)
+    if (newUrl.length > 1 && newUrl.endsWith("/")) {
+      newUrl = newUrl.slice(0, -1)
+      needsRedirect = true
+    }
 
     // Remove tracking parameters
-    const trackingParams = [
-      "utm_source",
-      "utm_medium",
-      "utm_campaign",
-      "utm_term",
-      "utm_content",
-      "fbclid",
-      "gclid",
-      "msclkid",
-      "ref",
-      "source",
-    ]
+    const trackingParams = ["fbclid", "gclid", "utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"]
+    const searchParams = new URLSearchParams(currentUrl.search)
 
-    let hasChanges = false
     trackingParams.forEach((param) => {
-      if (url.searchParams.has(param)) {
-        url.searchParams.delete(param)
-        hasChanges = true
+      if (searchParams.has(param)) {
+        searchParams.delete(param)
+        needsRedirect = true
       }
     })
 
-    if (hasChanges) {
-      window.history.replaceState({}, "", url.toString())
+    // Build clean URL
+    const cleanSearch = searchParams.toString()
+    const cleanUrl = newUrl + (cleanSearch ? `?${cleanSearch}` : "") + currentUrl.hash
+
+    if (needsRedirect && cleanUrl !== currentUrl.pathname + currentUrl.search + currentUrl.hash) {
+      router.replace(cleanUrl)
     }
-  }, [])
+  }, [router])
 
   return null
 }
