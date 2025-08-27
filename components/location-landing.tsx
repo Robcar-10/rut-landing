@@ -10,12 +10,12 @@ import { WorkShowcaseSection } from "./landing/WorkShowcaseSection"
 import { ServicesSection } from "./landing/ServicesSection"
 import { IndustriesSection } from "./landing/IndustriesSection"
 import { DifferentiatorsSection } from "./landing/DifferentiatorsSection"
-import { InternalLinksSection } from "./landing/InternalLinksSection"
 import { TestimonialsSection } from "./landing/TestimonialsSection"
 import { UploadSection } from "./landing/UploadSection"
 import { Footer } from "./landing/Footer"
 import { StickyMobileElements } from "./landing/StickyMobileElements"
 import { CookieConsent } from "./landing/CookieConsent"
+import { InternalLinksSection } from "./landing/InternalLinksSection"
 
 interface LocationLandingProps {
   location?: string
@@ -61,11 +61,12 @@ export default function LocationLanding({ location }: LocationLandingProps) {
           <ContactForm currentLocation={currentLocation} />
         </div>
 
+        <InternalLinksSection currentLocation={currentLocation} />
+
         <WorkShowcaseSection currentLocation={currentLocation} />
         <ServicesSection currentLocation={currentLocation} />
         <IndustriesSection currentLocation={currentLocation} />
         <DifferentiatorsSection currentLocation={currentLocation} />
-        <InternalLinksSection currentLocation={currentLocation} />
         <TestimonialsSection currentLocation={currentLocation} />
         <UploadSection currentLocation={currentLocation} />
       </main>
