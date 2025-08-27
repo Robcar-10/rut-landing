@@ -34,7 +34,7 @@ const nextConfig = {
     return config
   },
 
-  // FIXED REDIRECTS - Ensure all domains point to nyackscreenprinting.com
+  // SIMPLIFIED REDIRECTS - Only handle domain redirects here
   async redirects() {
     return [
       // Redirect old domain to new domain (HIGHEST PRIORITY)
@@ -70,12 +70,6 @@ const nextConfig = {
           },
         ],
         destination: "https://nyackscreenprinting.com/:path*",
-        permanent: true,
-      },
-      // Remove trailing slashes ONLY if they exist (avoid redirect loops)
-      {
-        source: "/:path+/",
-        destination: "/:path+",
         permanent: true,
       },
     ]

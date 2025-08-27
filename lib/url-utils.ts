@@ -78,35 +78,15 @@ export const getCanonicalUrl = (): string => {
 }
 
 /**
- * Check if current domain needs redirect
- */
-export const needsDomainRedirect = (): boolean => {
-  if (typeof window === "undefined") return false
-
-  const hostname = window.location.hostname
-  return (
-    hostname === "rolleduptees.com" || hostname === "www.rolleduptees.com" || hostname === "www.nyackscreenprinting.com"
-  )
-}
-
-/**
  * Redirect to clean URL if tracking parameters are present
- * Also handles domain redirects
+ * REMOVED domain redirect logic - handled by Next.js config
  */
 export const redirectToCleanUrl = (): boolean => {
   if (typeof window === "undefined") return false
 
   const currentUrl = window.location.href
 
-  // Check if domain needs redirect
-  if (needsDomainRedirect()) {
-    const canonicalUrl = getCanonicalUrl()
-    console.log("Redirecting to correct domain:", { from: currentUrl, to: canonicalUrl })
-    window.location.replace(canonicalUrl)
-    return true
-  }
-
-  // Check for tracking parameters
+  // Only check for tracking parameters - domain redirects handled by Next.js
   if (hasTrackingParameters(currentUrl)) {
     const cleanedUrl = cleanUrl(currentUrl)
 
