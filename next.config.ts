@@ -21,7 +21,6 @@ const nextConfig = {
     contentDispositionType: "attachment",
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
-  // External packages that should be bundled for server components
   serverExternalPackages: ["cloudinary"],
 
   webpack: (config, { isServer }) => {
@@ -34,39 +33,8 @@ const nextConfig = {
     return config
   },
 
-  // REMOVED ALL REDIRECTS - Now handled by vercel.json
+  // REMOVED ALL REDIRECTS AND HEADERS - Now handled by vercel.json only
   // This prevents conflicts and loops
-
-  // Headers for SEO and security
-  async headers() {
-    return [
-      {
-        source: "/(.*)",
-        headers: [
-          {
-            key: "X-DNS-Prefetch-Control",
-            value: "on",
-          },
-          {
-            key: "Strict-Transport-Security",
-            value: "max-age=31536000; includeSubDomains; preload",
-          },
-          {
-            key: "X-Frame-Options",
-            value: "DENY",
-          },
-          {
-            key: "X-Content-Type-Options",
-            value: "nosniff",
-          },
-          {
-            key: "Referrer-Policy",
-            value: "strict-origin-when-cross-origin",
-          },
-        ],
-      },
-    ]
-  },
 }
 
 module.exports = nextConfig

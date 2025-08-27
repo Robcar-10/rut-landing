@@ -35,61 +35,6 @@
       "permanent": true
     },
     {
-      "source": "/:path*",
-      "has": [
-        {
-          "type": "query",
-          "key": "fbclid"
-        }
-      ],
-      "destination": "/:path*",
-      "permanent": true
-    },
-    {
-      "source": "/:path*",
-      "has": [
-        {
-          "type": "query",
-          "key": "gclid"
-        }
-      ],
-      "destination": "/:path*",
-      "permanent": true
-    },
-    {
-      "source": "/:path*",
-      "has": [
-        {
-          "type": "query",
-          "key": "utm_source"
-        }
-      ],
-      "destination": "/:path*",
-      "permanent": true
-    },
-    {
-      "source": "/:path*",
-      "has": [
-        {
-          "type": "query",
-          "key": "utm_medium"
-        }
-      ],
-      "destination": "/:path*",
-      "permanent": true
-    },
-    {
-      "source": "/:path*",
-      "has": [
-        {
-          "type": "query",
-          "key": "utm_campaign"
-        }
-      ],
-      "destination": "/:path*",
-      "permanent": true
-    },
-    {
       "source": "/:path+/",
       "destination": "/:path+",
       "permanent": true
@@ -130,6 +75,5 @@
     "app/api/*/route.ts": {
       "maxDuration": 30
     }
-  },
-  "crons": []
+  }
 }

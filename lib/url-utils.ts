@@ -78,15 +78,15 @@ export const getCanonicalUrl = (): string => {
 }
 
 /**
- * Redirect to clean URL if tracking parameters are present
- * REMOVED domain redirect logic - handled by Next.js config
+ * Clean tracking parameters from current URL (client-side only)
+ * NO domain redirects - those are handled by vercel.json
  */
 export const redirectToCleanUrl = (): boolean => {
   if (typeof window === "undefined") return false
 
   const currentUrl = window.location.href
 
-  // Only check for tracking parameters - domain redirects handled by Next.js
+  // Only check for tracking parameters
   if (hasTrackingParameters(currentUrl)) {
     const cleanedUrl = cleanUrl(currentUrl)
 

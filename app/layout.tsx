@@ -2,6 +2,7 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
+import { CanonicalUrl } from "@/components/CanonicalUrl"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -40,7 +41,6 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  // FIXED: Proper canonical URL for homepage
   alternates: {
     canonical: baseUrl,
   },
@@ -187,6 +187,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        {/* Canonical URL - Server-side generated - ALWAYS points to nyackscreenprinting.com */}
+        <CanonicalUrl />
+
         {/* JSON-LD structured data */}
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
