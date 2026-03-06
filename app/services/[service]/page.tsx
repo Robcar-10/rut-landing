@@ -42,5 +42,5 @@ export default function ServicePage({ params }: ServicePageProps) {
 
   // `notFound()` throws internally but TS doesn't know that,
   // so `service` is still typed as `Service | undefined` here
-  return <ServiceLanding service={service!} /> // 👈 add the non-null assertion
+  return <ServiceLanding serviceInfo={service!} /> // 👈 add the non-null assertion
 }
