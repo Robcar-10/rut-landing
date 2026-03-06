@@ -16,7 +16,7 @@ import { LocationBanner } from "@/components/landing/LocationBanner"
 import { ContactForm } from "@/components/landing/ContactForm"
 import { InternalLinksSection } from "@/components/landing/InternalLinksSection"
 import { LocalContentSection } from "@/components/landing/LocalContentSection"
-import { NearbyTownsSection } from "@/components/landing/NearbyTownsSection"
+import { NearbyTownsSection } from "@/components/landing/NearbyTownSection"
 import { FAQSection } from "@/components/landing/FAQSection"
 import type { LocationContent } from "@/lib/location-content"
 
