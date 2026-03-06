@@ -9,33 +9,27 @@ import { DifferentiatorsSection } from "@/components/landing/DifferentiatorsSect
 import { WorkShowcaseSection } from "@/components/landing/WorkShowcaseSection"
 import { IndustriesSection } from "@/components/landing/IndustriesSection"
 import { TestimonialsSection } from "@/components/landing/TestimonialsSection"
-import { UploadSection } from "@/components/landing/UploadSection"
 import { Footer } from "@/components/landing/Footer"
 import { StickyMobileElements } from "@/components/landing/StickyMobileElements"
 import { CookieConsent } from "@/components/landing/CookieConsent"
 import { LocationBanner } from "@/components/landing/LocationBanner"
+import { ContactForm } from "@/components/landing/ContactForm"
+import { InternalLinksSection } from "@/components/landing/InternalLinksSection"
+import { LocalContentSection } from "@/components/landing/LocalContentSection"
+import { NearbyTownsSection } from "@/components/landing/NearbyTownsSection"
+import { FAQSection } from "@/components/landing/FAQSection"
+import type { LocationContent } from "@/lib/location-content"
 
 interface LocationLandingProps {
   location?: string
+  content?: LocationContent
 }
 
-export default function LocationLanding({ location }: LocationLandingProps) {
+export default function LocationLanding({ location, content }: LocationLandingProps) {
   const { currentLocation, isDetectingLocation, geolocationStatus, requestGPSLocation, setCurrentLocation } =
     useLocationDetection(location)
 
   const cookieConsent = useCookieConsent()
-
-  console.log("LocationLanding render - Cookie consent state:", {
-    isLoaded: cookieConsent.isLoaded,
-    preferences: cookieConsent.preferences,
-    shouldShowConsent: cookieConsent.shouldShowConsent,
-  })
-
-  const handleLocationSelect = (selectedLocation: string) => {
-    setCurrentLocation(selectedLocation)
-  }
-
-  console.log("Should show cookie consent:", cookieConsent.shouldShowConsent)
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50">
@@ -46,42 +40,59 @@ export default function LocationLanding({ location }: LocationLandingProps) {
         isDetectingLocation={isDetectingLocation}
         geolocationStatus={geolocationStatus}
         onRequestGPSLocation={requestGPSLocation}
-        onLocationSelect={handleLocationSelect}
+        onLocationSelect={setCurrentLocation}
       />
 
       <main className="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
-        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+
+        {/* Hero + Contact Form */}
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-start">
           <HeroSection currentLocation={currentLocation} />
-          <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Get Your Free Quote</h2>
-            <p className="text-gray-600 mb-6">
-              Ready to start your custom apparel project in {currentLocation}? Fill out our quick form for a
-              personalized quote.
-            </p>
-            <div className="space-y-4">
-              <button className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
-                Start Your Quote
-              </button>
-              <button className="w-full border border-purple-300 text-purple-600 hover:bg-purple-50 font-semibold py-3 px-6 rounded-lg transition-colors">
-                Call (845) 358-2037
-              </button>
-            </div>
-          </div>
+          <ContactForm currentLocation={currentLocation} />
         </div>
+
+        {/* Unique local intro — only on location pages */}
+        {content && (
+          <LocalContentSection
+            introParagraph={content.introParagraph}
+            localCallout={content.localCallout}
+            industriesNote={content.industriesNote}
+            locationName={content.name}
+            county={content.county}
+          />
+        )}
 
         <WorkShowcaseSection currentLocation={currentLocation} />
         <ServicesSection currentLocation={currentLocation} />
         <IndustriesSection currentLocation={currentLocation} />
         <DifferentiatorsSection currentLocation={currentLocation} />
         <TestimonialsSection currentLocation={currentLocation} />
-        <UploadSection currentLocation={currentLocation} />
+
+        {/* FAQs — town-specific on location pages, generic on homepage */}
+        {content ? (
+          <FAQSection faqs={content.faqs} locationName={content.name} />
+        ) : (
+          <FAQSection locationName={currentLocation} />
+        )}
+
+        {/* Nearby towns internal links — only on location pages */}
+        {content && content.nearbyTowns.length > 0 && (
+          <NearbyTownsSection
+            nearbyTowns={content.nearbyTowns}
+            currentLocationName={content.name}
+          />
+        )}
+
+        <InternalLinksSection currentLocation={currentLocation} />
+
       </main>
 
       <Footer currentLocation={currentLocation} />
       <StickyMobileElements currentLocation={currentLocation} />
 
-      {/* Cookie Consent - Only show if not yet decided and loaded */}
-      {cookieConsent.shouldShowConsent && <CookieConsent onAccept={cookieConsent.updatePreferences} />}
+      {cookieConsent.shouldShowConsent && (
+        <CookieConsent onAccept={cookieConsent.updatePreferences} />
+      )}
     </div>
   )
 }

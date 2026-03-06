@@ -3,7 +3,7 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import { UrlCleaner } from "@/components/UrlCleaner"
-import { CanonicalUrl } from "@/components/CanonicalUrl"
+import { LocalBusinessSchema } from "@/components/LocalBusinessSchema"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -26,16 +26,13 @@ export const metadata: Metadata = {
   creator: "Nyack Screen Printing",
   publisher: "Nyack Screen Printing",
   metadataBase: new URL("https://nyackscreenprinting.com"),
-  alternates: {
-    canonical: "https://nyackscreenprinting.com",
-  },
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://nyackscreenprinting.com",
     siteName: "Nyack Screen Printing",
     title: "Nyack Screen Printing | Custom T-Shirts & Apparel in Rockland County",
-    description: "Professional screen printing and custom apparel services in Nyack, NY and surrounding areas.",
+    description:
+      "Professional screen printing and custom apparel services in Nyack, NY and surrounding areas.",
     images: [
       {
         url: "/images/og-image.jpg",
@@ -48,7 +45,8 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Nyack Screen Printing | Custom T-Shirts & Apparel",
-    description: "Professional screen printing and custom apparel services in Nyack, NY and surrounding areas.",
+    description:
+      "Professional screen printing and custom apparel services in Nyack, NY and surrounding areas.",
     images: ["/images/twitter-image.jpg"],
   },
   robots: {
@@ -64,20 +62,17 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
-  verification: {
-    google: "your-google-verification-code",
-  },
+  // Replace with your real code from Google Search Console, or remove this block:
+  // verification: {
+  //   google: "YOUR_REAL_CODE_HERE",
+  // },
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body className={inter.className}>
-        <CanonicalUrl />
+        <LocalBusinessSchema />
         <UrlCleaner />
         {children}
       </body>

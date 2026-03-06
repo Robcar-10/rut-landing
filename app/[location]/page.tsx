@@ -1,68 +1,56 @@
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
-import { LOCATIONS } from "@/lib/constants"
+import { locationSlugs } from "@/lib/location-utils"
+import { getLocationContent } from "@/lib/location-content"
+import { LocationSchema } from "@/components/LocalBusinessSchema"
 import LocationLanding from "@/components/location-landing"
-import { CanonicalUrl } from "@/components/CanonicalUrl"
-import { UrlCleaner } from "@/components/UrlCleaner"
 
 interface LocationPageProps {
-  params: {
-    location: string
-  }
+  params: { location: string }
 }
 
 export async function generateStaticParams() {
-  return LOCATIONS.map((location) => ({
-    location: location.slug,
-  }))
+  return locationSlugs.map((slug) => ({ location: slug }))
 }
 
 export async function generateMetadata({ params }: LocationPageProps): Promise<Metadata> {
-  const location = LOCATIONS.find((loc) => loc.slug === params.location)
+  const content = getLocationContent(params.location)
 
-  if (!location) {
-    return {
-      title: "Location Not Found",
-    }
+  if (!content) {
+    return { title: "Location Not Found" }
   }
 
-  const title = `Screen Printing in ${location.name}, ${location.county} | Nyack Screen Printing`
-  const description = `${location.description} Professional screen printing and custom apparel services serving ${location.name} and surrounding areas.`
-
   return {
-    title,
-    description,
+    title: content.metaTitle,
+    description: content.metaDescription,
+    alternates: {
+      canonical: `https://nyackscreenprinting.com/${content.slug}`,
+    },
     openGraph: {
-      title,
-      description,
-      url: `https://nyackscreenprinting.com/${location.slug}`,
+      title: content.metaTitle,
+      description: content.metaDescription,
+      url: `https://nyackscreenprinting.com/${content.slug}`,
       siteName: "Nyack Screen Printing",
       locale: "en_US",
       type: "website",
     },
     twitter: {
       card: "summary_large_image",
-      title,
-      description,
-    },
-    alternates: {
-      canonical: `https://nyackscreenprinting.com/${location.slug}`,
+      title: content.metaTitle,
+      description: content.metaDescription,
     },
   }
 }
 
 export default function LocationPage({ params }: LocationPageProps) {
-  const location = LOCATIONS.find((loc) => loc.slug === params.location)
+  const content = getLocationContent(params.location)
 
-  if (!location) {
-    notFound()
-  }
+  if (!content) notFound()
 
   return (
     <>
-      <CanonicalUrl url={`https://nyackscreenprinting.com/${location.slug}`} />
-      <UrlCleaner />
-      <LocationLanding location={location.slug} />
+      <LocationSchema slug={params.location} />
+      <LocationLanding location={params.location} content={content} />
     </>
   )
 }

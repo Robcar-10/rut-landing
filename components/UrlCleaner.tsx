@@ -3,6 +3,11 @@
 import { useEffect, Suspense } from "react"
 import { useSearchParams, useRouter, usePathname } from "next/navigation"
 
+const TRACKING_PARAMS = [
+  "fbclid", "gclid", "utm_source", "utm_medium", "utm_campaign",
+  "utm_term", "utm_content", "msclkid", "ttclid", "twclid",
+]
+
 function UrlCleanerContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -12,22 +17,18 @@ function UrlCleanerContent() {
     const params = new URLSearchParams(searchParams.toString())
     let hasChanges = false
 
-    // Remove tracking parameters
-    const trackingParams = ["fbclid", "gclid", "utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"]
-
-    trackingParams.forEach((param) => {
+    TRACKING_PARAMS.forEach((param) => {
       if (params.has(param)) {
         params.delete(param)
         hasChanges = true
       }
     })
 
-    // Only redirect if there were changes
     if (hasChanges) {
       const newUrl = params.toString() ? `${pathname}?${params.toString()}` : pathname
-      router.replace(newUrl)
+      router.replace(newUrl, { scroll: false })
     }
-  }, [searchParams, router, pathname])
+  }, [searchParams.toString(), router, pathname])
 
   return null
 }
