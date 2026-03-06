@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation"
 import type { Metadata } from "next"
-import { SERVICES } from "@/lib/constants"
+import { SERVICES, getServiceBySlug } from "@/lib/service-utils" 
 import ServiceLanding from "@/components/service-landing"
 
 interface ServicePageProps {
