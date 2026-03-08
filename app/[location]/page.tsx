@@ -6,7 +6,7 @@ import { LocationSchema } from "@/components/LocalBusinessSchema"
 import LocationLanding from "@/components/location-landing"
 
 interface LocationPageProps {
-  params: { location: string }
+  params: Promise<{ location: string }>  // 👈 wrap in Promise
 }
 
 export async function generateStaticParams() {
@@ -14,7 +14,8 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: LocationPageProps): Promise<Metadata> {
-  const content = getLocationContent(params.location)
+  const { location } = await params
+  const content = getLocationContent(location)
 
   if (!content) {
     return { title: "Location Not Found" }
@@ -42,15 +43,16 @@ export async function generateMetadata({ params }: LocationPageProps): Promise<M
   }
 }
 
-export default function LocationPage({ params }: LocationPageProps) {
-  const content = getLocationContent(params.location)
+export default async function LocationPage({ params }: LocationPageProps) {
+  const { location } = await params
+  const content = getLocationContent(location)
 
   if (!content) notFound()
 
   return (
     <>
-      <LocationSchema slug={params.location} />
-      <LocationLanding location={params.location} content={content} />
+      <LocationSchema slug={location} />
+      <LocationLanding location={location} content={content} />
     </>
   )
 }

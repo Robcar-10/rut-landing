@@ -88,25 +88,20 @@ export const useLocationDetection = (initialLocation?: string): UseLocationDetec
       setGeolocationStatus("detecting")
 
       try {
-        // Priority 1: Check if user has a saved location preference
-        const savedPreference = getUserLocationPreference()
-        if (savedPreference && isValidServiceLocation(savedPreference)) {
-          console.log("Using saved user preference:", savedPreference)
-          updateLocation(savedPreference, "saved")
+        // Priority 1: If a location page slug is provided, always use it
+        if (initialLocation) {
+          const displayLocation = getLocationDisplayName(initialLocation)
+          console.log("Using page location:", displayLocation)
+          updateLocation(displayLocation, "initial")
           setGeolocationStatus("success")
           return
         }
 
-        // Priority 2: Only use URL/initial location if it's from a direct navigation (not shared link)
-        // We can detect this by checking if there's a referrer or if it's the first page load
-        const isDirectNavigation =
-          typeof window !== "undefined" &&
-          (document.referrer === "" || document.referrer.includes(window.location.hostname))
-
-        if (initialLocation && isDirectNavigation) {
-          const displayLocation = getLocationDisplayName(initialLocation)
-          console.log("Using initial location (direct navigation):", displayLocation)
-          updateLocation(displayLocation, "initial")
+        // Priority 2: Check if user has a saved location preference (homepage only)
+        const savedPreference = getUserLocationPreference()
+        if (savedPreference && isValidServiceLocation(savedPreference)) {
+          console.log("Using saved user preference:", savedPreference)
+          updateLocation(savedPreference, "saved")
           setGeolocationStatus("success")
           return
         }
@@ -126,8 +121,8 @@ export const useLocationDetection = (initialLocation?: string): UseLocationDetec
             saveUserLocationPreference(ipLocation, "ip")
             setGeolocationStatus("ip-detected")
 
-            // Update URL with detected location (but don't replace history for shared links)
-            if (typeof window !== "undefined" && isDirectNavigation) {
+            // Update URL with detected location
+            if (typeof window !== "undefined") {
               const newUrl = new URL(window.location.href)
               newUrl.searchParams.set("location", ipLocation.toLowerCase().replace(" ", "-"))
               window.history.replaceState({}, "", newUrl.toString())
