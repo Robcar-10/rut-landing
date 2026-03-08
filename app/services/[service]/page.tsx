@@ -1,12 +1,10 @@
 import { notFound } from "next/navigation"
 import type { Metadata } from "next"
-import { SERVICES, getServiceBySlug } from "@/lib/service-utils" 
+import { SERVICES, getServiceBySlug } from "@/lib/service-utils"
 import ServiceLanding from "@/components/service-landing"
 
 interface ServicePageProps {
-  params: {
-    service: string
-  }
+  params: Promise<{ service: string }>
 }
 
 export async function generateStaticParams() {
@@ -16,7 +14,8 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: ServicePageProps): Promise<Metadata> {
-  const service = SERVICES.find((svc) => svc.slug === params.service)
+  const { service: serviceSlug } = await params
+  const service = getServiceBySlug(serviceSlug)
 
   if (!service) {
     return {
@@ -25,22 +24,21 @@ export async function generateMetadata({ params }: ServicePageProps): Promise<Me
   }
 
   return {
-    title: `${service.name} Services in Rockland County | Nyack Screen Printing`,
-    description: `${service.description} Professional ${service.name.toLowerCase()} services with ${service.turnaround} turnaround.`,
+    title: `${service.title} in Rockland County | Nyack Screen Printing`,
+    description: `${service.description} Professional ${service.title.toLowerCase()} with ${service.turnaround} turnaround.`,
     alternates: {
       canonical: `https://nyackscreenprinting.com/services/${service.slug}`,
     },
   }
 }
 
-export default function ServicePage({ params }: ServicePageProps) {
-  const service = SERVICES.find((svc) => svc.slug === params.service)
+export default async function ServicePage({ params }: ServicePageProps) {
+  const { service: serviceSlug } = await params
+  const service = getServiceBySlug(serviceSlug)
 
   if (!service) {
     notFound()
   }
 
-  // `notFound()` throws internally but TS doesn't know that,
-  // so `service` is still typed as `Service | undefined` here
-  return <ServiceLanding serviceInfo={service!} /> // 👈 add the non-null assertion
+  return <ServiceLanding serviceInfo={service!} />
 }
