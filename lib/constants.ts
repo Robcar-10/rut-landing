@@ -1,26 +1,10 @@
 import { Printer, Palette, Monitor, Store, Phone, Mail, MapPin } from "lucide-react"
 
 export const mainNavLinks = [
-  {
-    title: "Screen Printing",
-    route: "/screen-printing",
-    icon: Printer,
-  },
-  {
-    title: "Embroidery",
-    route: "/custom-embroidery",
-    icon: Palette,
-  },
-  {
-    title: "Digital Printing",
-    route: "/digital-printing",
-    icon: Monitor,
-  },
-  {
-    title: "Merch Stores",
-    route: "/merch-stores",
-    icon: Store,
-  },
+  { title: "Screen Printing", route: "/services/screen-printing", icon: Printer },
+  { title: "Embroidery", route: "/services/embroidery", icon: Palette },
+  { title: "Digital Printing", route: "/services/vinyl-printing", icon: Monitor },
+  { title: "Merch Stores", route: "/services/merch-stores", icon: Store },
 ]
 
 export const contactInfo = [

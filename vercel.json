@@ -33,7 +33,27 @@
       ],
       "destination": "https://nyackscreenprinting.com/$1",
       "permanent": true
-    }
+    },
+    {
+  "source": "/screen-printing",
+  "destination": "/services/screen-printing",
+  "permanent": true
+},
+{
+  "source": "/custom-embroidery",
+  "destination": "/services/embroidery",
+  "permanent": true
+},
+{
+  "source": "/digital-printing",
+  "destination": "/services/vinyl-printing",
+  "permanent": true
+},
+{
+  "source": "/merch-stores",
+  "destination": "/services/merch-stores",
+  "permanent": true
+}
   ],
   "headers": [
     {
